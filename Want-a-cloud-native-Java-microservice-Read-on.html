@@ -1,0 +1,38 @@
+Getting started with a normal Java project can be a bit daunting but add in some of the latest things that developers want, such as microservices and cloud native, and the time to actually having something up-and-running has just gone up drastically!
+
+Enter the new <a href="https://console.ng.bluemix.net/developer/getting-started/">IBM Cloud Web and Mobile starters</a> which allow you to quickly scaffold out a cloud native microservice. There are a number of languages to choose from: Java, Swift, and JavaScript/Node.js; a selection of patterns, such as microservice; and the opportunity to add in back-end services like Cloudant and Object-Storage.
+
+The diagram below shows a high level view of the steps you take according to whether you prefer to use a GUI or a command line.
+
+<h3>Overview of code creation to deployment</h3>
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/Screen-Shot-2017-03-17-at-13.52.09-e1489770277521.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/Screen-Shot-2017-03-17-at-13.52.09-e1489770277521.png" alt="" width="1000" height="562" class="aligncenter size-full wp-image-21997" /></a>
+
+So, let's create a Java microservice ...
+
+<h3>Step 1: choose your starting point</h3>
+
+You can create a new Java microservice either through the <a href="https://console.ng.bluemix.net/developer/getting-started/">IBM Cloud console</a>, or using the new command line. To use the command line,
+
+<ol>
+    <li>Install the <a href="http://clis.ng.bluemix.net/ui/home.html">IBM Cloud CLI</a></li>
+    <li>Install the <a href="https://console.ng.bluemix.net/docs/cloudnative/dev_cli.html">developer plugin</a></li>
+</ol>
+
+If you're using the IBM Cloud console, select the <strong>Create Project</strong> option. After that it is the same for both interfaces: select <strong>Microservice</strong>, <strong>Basic</strong>, and then <strong>Java</strong>.
+
+<h3>Step 2: add some services</h3>
+
+You can now add some data services to your project. Currently, you can pick from Cloudant or Object-Storage (or both if you want!). The really great thing is that these services will be provisioned automatically for you; no need to remember to create and bind them at a later point in time. Even better than that, the code that is generated for you will contain all the code you need to connect to these services using current best practices. So, in the case of the Java microservice, you will be given CDI injected connectors to your services all ready to be used in your code.
+
+<h3>Step 3: download the code for local development</h3>
+
+After making your selections, you'll want to download the code and see what it looks like. If you're using the CLI then this is automatically done for you; if you're using the console, then you'll need to click on the <strong>Generate Code</strong> button and then download it once it's been created. At this point you can optionally do some local development on the code. A really cool feature here is that if you added services to your project in the previous steps, your local Java runtime will be using those cloud services rather than having to mock out the calls when running locally.
+
+<h3>Step 4: deployment</h3>
+
+There are a couple of ways you can now deploy your code to IBM Cloud. You can push it into a Github repository, at which point a <strong>Create toolchain</strong> button will appear: click on that and it will create a toolchain in IBM Cloud that pulls the code from your repository and deploys it. Alternatively you can use the CLI to run the <code>bx dev deploy</code> command that will deploy it for you. If you want to check on what's been deployed, just use the IBM Cloud console.
+
+<h3>Finally</h3>
+
+This post is just a quick introduction and high level overview of how you can use the new code-generation capabilities in IBM Cloud to generate yourself a Java microservice and deploy it to the cloud. You can do this through the IBM Cloud console, using the command line, or even just mix and match the two. The choice is yours. Keep an eye out for future articles in which we'll dive into the Java microservice in more detail, walking you through the actual classes that have been created and how you can use them as a basis for your own services. Finally, just explore and have fun playing with the new features, over time we’ll be adding more patterns, services, and microservices functionality. If you have any questions or suggestions, we’d love to hear them. Hang out with our team on the <a href="http://ibm-cloud-tech.slack.com/"><strong>#cloud-native</strong> Slack channel</a> and register at <a href="http://ibm.biz/IBMCloudNativeSlack">http://ibm.biz/IBMCloudNativeSlack</a>

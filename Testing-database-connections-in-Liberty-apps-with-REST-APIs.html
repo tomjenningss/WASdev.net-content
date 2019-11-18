@@ -1,0 +1,224 @@
+How many times have you had to write a server-side test that gets a connection just to check if your configuration is valid and your app can connect to your database?
+
+In the <a href="/wasdev/blog/2017/04/13/beta-websphere-liberty-tools-april-2017/">April 2017 beta</a> we introduced a REST API for the configuration validation (Validator) feature. You can use the API to perform tests to check that supported elements of your configuration are valid. This initial beta release of the feature addresses one of the most common use cases: JDBC data sources.
+
+Let's take a look at how you can use this new REST API to validate your data source configuration.
+
+<h3>Example server configuration</h3>
+
+This is some sample <code>server.xml</code> configuration that will enable <code>validator-1.0</code> and <code>jdbc-4.1</code>. This allows you to use API discovery to test out a JDBC connection:
+
+[code lang="xml"]<server>
+  <featureManager>
+    <!-- validator-1.0 is a temporary feature needed to enable this functionality -->
+    <feature>validator-1.0</feature>
+    <feature>jdbc-4.1</feature>
+  </featureManager>
+  
+  <library id="jdbcLib">
+    <!-- You must supply a JDBC driver jar -->
+    <fileset dir="${server.config.dir}/jdbc" includes="*.jar"/>
+  </library>
+ 
+  <dataSource id="DefaultDataSource">
+    <jdbcDriver libraryRef="jdbcLib"/>
+    <!-- Example properties referencing an in-memory Derby Embedded database -->
+    <properties.derby.embedded databaseName="memory:defaultdb" createDatabase="create"/>
+  </dataSource>
+  
+  <httpEndpoint id="defaultHttpEndpoint" httpPort="9080" httpsPort="9443" />
+  
+  <!-- Simplest security setup to access API discovery with credentials admin/admin -->
+  <keyStore id="defaultKeyStore" password="Liberty"/>
+  <quickStartSecurity userName="admin" userPassword="admin"/>
+</server>
+[/code]
+
+<h3>Accessing the API discovery UI</h3>
+
+To access the API discovery UI, start your server and you should see the following console output:
+
+<pre>$ ./server run defaultServer
+Launching defaultServer (WebSphere Application Server 17.0.0.2/wlp-1.0.17.20170303-0602) on IBM J9 VM, version pwa6480sr1-20150417_01 (SR1) (en_US)
+[AUDIT ] CWWKE0001I: The server val has been launched.
+[AUDIT ] CWWKZ0058I: Monitoring dropins for applications.
+[AUDIT ] CWWKF0012I: The server installed the following features: [servlet-3.0, ssl-1.0, jndi-1.0, apiDiscovery-1.0, json-1.0, distributedMap-1.0, jdbc-4.1, validator-1.0].
+[AUDIT ] CWWKF0011I: The server val is ready to run a smarter planet.
+[AUDIT ] CWWKT0016I: Web application available (default_host): http://localhost:9080/ibm/api/explorer/
+[AUDIT ] CWWKT0016I: Web application available (default_host): http://localhost:9080/ibm/api/
+[AUDIT ] CWWKT0016I: Web application available (default_host): http://localhost:9080/api/explorer/
+[AUDIT ] CWWKT0016I: Web application available (default_host): http://localhost:9080/api/docs/
+</pre>
+
+When your server is running, go to the URL <code>https://localhost:9443/ibm/api/explorer/</code> to access the API discovery UI. Note that the HTTP protocol and port is shown in the server's console output but we need to be using the secure port (9443) along with the HTTPS protocol in order to access the API discovery UI.
+
+<h3>Test a data source connection with API discovery</h3>
+
+On the API Discovery page, expand the Validator section to view the test operations:
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/swagger_ui_options.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/swagger_ui_options-1024x309.png" alt="" width="640" height="193" class="aligncenter size-large wp-image-22107 screenshot" /></a>
+Between the <code>GET</code> and <code>POST</code> operations, you should be able to mimic any pattern that an application might use to access a database:
+
+<ul>
+<li>To test the data source as it sits in your <code>server.xml</code>, you can use the GET or POST operation. This is equivalent to invoking <code>DataSource.getConnection()</code> from an application with no application-specific bindings or resource reference customizations i.e. <code>@Resource(authenticationType = AuthenticationType.CONTAINER)</code></li>
+<li>To test a data source with a specific set of credentials, you must use the POST operation. This is equivalent to invoking <code>DataSource.getConnection(String user, String password)</code> from an application.</li>
+<li>To test a data source with a specific set of auth data (e.g. custom auth data in application bindings) you can use the GET operation to specify which auth data ID should be used to authenticate. Note that if your data source configuration specifies <code>containerAuthData</code>, it is not necessary to use this option.</li>
+</ul>
+
+Click a <strong>POST</strong> or <strong>GET</strong> option, depending on what you need to test, to open a form in which you can enter your connection values.
+
+<h3>Testing a data source connection using application authentication</h3>
+
+One of the most direct ways to test a database connection is by <em>application authentication</em>, invoking <code>DataSource.getConnection(String user, String password)</code> with the credentials that you want to use to authenticate with the database.
+
+To test a database connection using application authentication, use the following options:
+
+<ul>
+<li>For the <strong>Response Content Type</strong>, select <strong>application/json</strong>.</li>
+<li>For the <strong>uid</strong>, type <code>DefaultDataSource</code>.</li>
+<li>For the <strong>auth*, select **application</strong>.</li>
+<li>For the <strong>X-Validator-User</strong>, type <code>dbuser</code>.</li>
+<li>For the <strong>X-Validator-Password</strong>, type the password for that account.</li>
+</ul>
+
+Where <code>DefaultDataSource</code> is the name of your data source, and <code>dbuser</code> is the user name for accessing the database.
+
+Click <strong>Try it out!</strong>.
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/swagger_ui_post_auth_app.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/swagger_ui_post_auth_app-1024x537.png" alt="" width="640" height="336" class="aligncenter size-large wp-image-22111 screenshot" /></a>
+
+If the connection test is successful, the result is displayed with some basic metadata regarding the database and JDBC driver; for example:
+[code lang="javascript"]
+{
+  "uid": "DefaultDataSource",
+  "id": "DefaultDataSource",
+  "info": {
+    "databaseProductName": "Apache Derby",
+    "databaseProductVersion": "10.11.1.1 - (1616546)",
+    "jdbcDriverName": "Apache Derby Embedded JDBC Driver",
+    "jdbcDriverVersion": "10.11.1.1 - (1616546)",
+    "schema": "APP",
+    "user": "APP"
+  }
+}
+[/code]
+
+<h3>Example failure scenarios for testing a data source connection</h3>
+
+If the data source is not found, the following result is given:
+[code lang="javascript"]
+{
+  "uid": "DefaultDataSource",
+  "failure": {
+    "message": "Did not find any configured instances of dataSource matching the request"
+  }
+}
+[/code]
+If the <code>&lt;jdbcDriver></code> references a library that does not contain any valid <code>DataSource</code> implementation, the following result is given:
+[code lang="javascript"]
+{
+  "uid": "DefaultDataSource",
+  "id": "DefaultDataSource",
+  "failure": {
+    "class": "java.sql.SQLNonTransientException",
+    "message": "DSRA4000E: A valid JDBC driver implementation class was not found for the jdbcDriver dataSource[DefaultDataSource]/jdbcDriver[default-0] using the library jdbcLib. []",
+    "stack": [
+      "com.ibm.ws.jdbc.internal.JDBCDriverService.classNotFound(JDBCDriverService.java:195)",
+      "com.ibm.ws.jdbc.internal.JDBCDriverService.create(JDBCDriverService.java:297)",
+      "com.ibm.ws.jdbc.internal.JDBCDriverService.createDefaultDataSource(JDBCDriverService.java:396)",
+      // stack trace cut short
+      "java.lang.Thread.run(Thread.java:785)"
+    ],
+    "cause": {
+      "class": "java.lang.ClassNotFoundException",
+      "message": "org.apache.derby.jdbc.EmbeddedXADataSource40",
+      "stack": [
+        "com.ibm.ws.classloading.internal.AppClassLoader.findClassCommonLibraryClassLoaders(AppClassLoader.java:499)",
+        // stack trace cut short
+        "java.lang.Thread.run(Thread.java:785)"
+      ]
+    }
+  }
+}
+[/code]
+
+<h3>Additional connection testing scenarios</h3>
+
+With the new Validator REST API we want you to be able to test your data source connections exactly as your application uses them. Here are the various data source authentication mechanisms that an application might use and how you can exercise them using the validator REST API.
+
+<h4> Container Authentication </h4>
+
+To test container authentication (i.e. <code>DataSource.getConnection()</code> with a <code>authData</code> element used for authentication), use the <code>GET/POST /ibm/api/validator/dataSource/{uid}</code> API.
+
+For the following <code>server.xml</code> configuration:
+[code lang="xml"]
+<authData id="myAuthData" user="me" password="secret"/>
+
+<dataSource id="myDataSource" containerAuthDataRef="myAuthData">
+  <jdbcDriver libraryRef="jdbcLib"/>
+  <properties ... />
+</dataSource>
+[/code]
+
+Specify the following properties:
+
+<ul>
+<li><strong>uid</strong>: <code>myDataSource</code></li>
+<li><strong>auth</strong>: <code>container</code></li>
+<li><strong>authAlias</strong>: <code>myAuthData</code></li>
+<li><strong>X-Validator-User</strong>: <code>&lt;unset&gt;</code></li>
+<li><strong>X-Validator-Password</strong>: <code>&lt;unset&gt;</code></li>
+</ul>
+
+<h4> Application Authentication </h4>
+
+To test application authentication (i.e. <code>DataSource.getConnection(userName, password)</code>), use the <code>POST /ibm/api/validator/dataSource/{uid}</code> API.
+
+For the following <code>server.xml</code> configuration:
+[code lang="xml"]
+<dataSource id="myDataSource">
+  <jdbcDriver libraryRef="jdbcLib"/>
+  <properties ... />
+</dataSource>
+[/code]
+
+Specify the following properties:
+
+<ul>
+<li><strong>uid</strong>: <code>myDataSource</code></li>
+<li><strong>auth</strong>: <code>application</code></li>
+<li><strong>authAlias</strong>: <code>&lt;unset&gt;</code></li>
+<li><strong>X-Validator-User</strong>: <code>me</code></li>
+<li><strong>X-Validator-Password</strong>: <code>secret</code></li>
+</ul>
+
+<h4> Direct lookup </h4>
+
+To test a direct lookup (i.e. <code>new InitialContext().lookup("jdbc/myDataSource")</code> where there is no resource reference bound to <code>jdbc/myDataSource</code>), use the  <code>GET/POST /ibm/api/validator/dataSource/{uid}</code> API.
+
+For the following <code>server.xml</code> configuration:
+[code lang="xml"]
+<dataSource id="myDataSource" jndiName="jdbc/myDataSource">
+  <jdbcDriver libraryRef="jdbcLib"/>
+  <!-- Setting a user and password directly on data source properties is not recommended. -->
+  <!-- Instead, you should configure user and password on an authData element             -->
+  <properties ... user="me" password="secret"/>
+</dataSource>
+[/code]
+
+Specify the following properties:
+
+<ul>
+<li><strong>uid</strong>: <code>myDataSource</code></li>
+<li><strong>auth</strong>: <code>&lt;unset&gt;</code></li>
+<li><strong>authAlias</strong>: <code>&lt;unset&gt;</code></li>
+<li><strong>X-Validator-User</strong>: <code>&lt;unset&gt;</code></li>
+<li><strong>X-Validator-Password</strong>: <code>&lt;unset&gt;</code></li>
+</ul>
+
+<h3> Give us feedback! </h3>
+
+The configuration validation REST API will be in beta for several months, so please give the feature a try and let us know if you have any ideas for improvement.
+
+<p class="ibm-btn-row pn-p40">
+<a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a>
+</p>

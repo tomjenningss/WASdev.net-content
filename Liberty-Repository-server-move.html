@@ -1,0 +1,18 @@
+We are planning to move a part of the IBM Liberty Repository to a new server on the 7th of March.
+
+<b>Most users shouldn't notice the change</b> because tools that access the repository will start using the new server automatically. However, if you have a firewall that restricts outgoing connections using an IP address whitelist, you'll need to allow traffic to the new server IP addresses.
+
+If you do need to update your firewall settings, the new server IP addresses are <b>169.46.16.130</b> and <b>169.46.17.242</b>.
+
+<h2>Background to the Liberty Repository</h2>
+
+Whenever you install new features or samples into a Liberty runtime, those files are usually fetched from a repository. Although you can install from a file-based repository or set up a local repository server, by default the files are fetched from the IBM Liberty Repository. InstallUtility, featureManager, Installation Manager and Websphere Development Tools for Eclipse can all install features from the repository. The <a href="https://developer.ibm.com/wasdev/downloads/">Downloads</a> section of WASdev also gets the data for each available download from the IBM Liberty Repository.
+
+The IBM Liberty Repository consists of two parts (neither of these services are easily accessible with a web browser):
+
+<ul>
+    <li>The asset service, a REST service which stores metadata about the available files. This is hosted on asset-websphere.ibm.com</li>
+    <li>The file store, which serves the actual files. This is hosted on public.dhe.ibm.com</li>
+</ul>
+
+We're moving the asset service component to a new server with a new IP address. We'll update the DNS entry for asset-websphere.ibm.com so that the programs you're using can find the new server. For most users, this shouldn't cause a problem. It's only if you're using an firewall that restricts outbound connections by IP that you must allow access to the new IP addresses to continue using the repository.

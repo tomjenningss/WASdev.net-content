@@ -1,0 +1,140 @@
+Since its release in late 2015, WebSphere Liberty's API discovery has been adopted by many customers and stack products as a framework for exposing REST APIs. During that time the <a href="https://www.openapis.org/">Open API Initiative</a> was created, providing an official version (OpenAPI) of the former Swagger specification.
+
+<h2>Usage patterns</h2>
+
+There are different ways that customers are using this feature: developers love how easily they can see and test the APIs in the OpenAPI UI, and administrators really like that now they can integrate their systems APIs with API management frameworks, especially the <a href="https://developer.ibm.com/wasdev/blog/2016/04/13/deploying-swagger-enabled-endpoints-websphere-liberty-bluemix-api-connect/">API Connect bridge</a>.
+
+We started to see a pattern where customers were not only using this framework for development but for production as well. Some are using the API discovery framework as a dynamic catalog of the APIs they are exposing, while others just want a built-in UI for the APIs in their product or user extension bundles (e.g. <a href="https://www.ibm.com/developerworks/downloads/ws/wsdg/">WebSphere eXtreme Scale</a>).
+
+Because of this overwhelming external exposure of the framework, two <a href="https://developer.ibm.com/wasdev/help/submit-rfe/">requests for enhancements</a> surged with many votes: the ability to access the UI and documents without SSL or basic authentication, and the ability to customize the look-and-feel of the UI.
+
+Both of these requests have been implemented and are now available in <a href="/wasdev/blog/2017/03/14/new-release-websphere-liberty-17-0-0-1/">Liberty 17.0.0.1</a>! Let's take a look at the new functionality.
+
+<h2>Public API discovery</h2>
+
+We have introduced two new endpoints, <code>/api/explorer</code> and <code>/api/docs</code>, both of which can be accessed without authentication using either HTTP or HTTPS. This means that consumers of your APIs can easily access the OpenAPI docs and 'try out' the endpoints without configuring SSL or being included in the basic registry. These endpoints are enabled by default and the <code>api</code> portion of the URL can be configured by using the new <code>publicURL</code> attribute, for example:
+
+[code lang="xml"]
+<apiDiscovery publicURL="cloud/apis" />
+[/code]
+
+With the above configuration you would access the OpenAPI UI via the address <code>http:///vm1:9080/cloud/apis/explorer</code> without authentication. If you want to use the protected endpoint <code>/ibm/api/explorer</code> you would need to configure the appropriate security elements.
+
+In the public UI, Liberty's runtime endpoints, such as the JMX REST connector, API discovery, Batch, etc, do not appear - the purpose of the public UI is for you to expose your APIs.
+
+We added the necessary attributes for you to control which APIs are made available in the public UI. If you want a particular application to remain only accessible via the protected endpoint <code>/ibm/api/explorer</code>, you can set its <code>public</code> attribute to false, for example:
+
+[code lang="xml"]
+<apiDiscovery publicURL="myAPI">
+   <webModuleDoc contextRoot="/MyApp" public="false" />
+</apiDiscovery>
+[/code]
+
+For more information, check out <a href="https://knowledgecenters.hursley.ibm.com/liberty-refresh/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_api_discovery.html">this page</a>.
+
+<h2>Customized master OpenAPI document and UI</h2>
+
+You can now customize all aspects of the master OpenAPI document (e.g. the <code>info</code> element, <code>host</code>, <code>basePath</code>, <code>scheme</code>, etc). This change applies to the <code>/docs</code> endpoint as well as the <code>/explorer</code> endpoint, which means you can customize the title and description that appear in the UI. This customization can be done using an OpenAPI snippet that is referenced from the new <code>swaggerDefinition</code> attribute. Here's an example:
+
+[code lang="xml"]
+<apiDiscovery swaggerDefinition="${server.config.dir}/custom/swaggerDef.yaml" />
+[/code]
+
+This snippet document needs to follow the structure of the OpenAPI specification but it does not need to be complete on its own. For example, you could have a snippet such as:
+
+[code]
+---
+swagger: '2.0'
+info:
+  title: Checkout APIs
+  description: APIs to checkout from our online store
+  version: 2.1.0
+[/code]
+
+You will see these changes propagating into the aggregated OpenAPI document:
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-23-at-1.48.58-PM.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-23-at-1.48.58-PM-1024x354.png" alt="Screen Shot 2017-02-23 at 1.48.58 PM" width="640" height="221" class="aligncenter size-large wp-image-21706 screenshot" /></a>
+
+And in the UI:
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-23-at-1.48.13-PM.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-23-at-1.48.13-PM.png" alt="Screen Shot 2017-02-23 at 1.48.13 PM" width="640" class="aligncenter size-full wp-image-21707 screenshot" /></a>
+
+We also have an optimization for single-application scenarios, in which the app's OpenAPI doc (via annotations or pre-generated) becomes the 'master doc' automatically.
+
+Here's a snippet of an application that is overriding the <code>title</code> and <code>description</code> values using annotations:
+
+[code lang="java"]
+@ApplicationPath("/")
+@SwaggerDefinition(
+		info = @Info(description = "Service for booking and managing air flights",
+					 version = "1.0.1",
+					 title = "Airline Service"),
+		tags= {@Tag(name="Airline Booking API", 
+					description="APIs for booking and managing air flights")})
+public class JAXRSApp extends Application {
+[/code]
+
+When the above application is deployed into Liberty, with no other sibling applications, it does not need to specify a <code>swaggerDefinition</code> attribute inside the <code>server.xml</code>.
+
+<h3>Styling</h3>
+
+The customization also extends to the explorer: users can now specify a CSS file that overrides the basic styling of the top of the explorer page, such as the logo and banner colour. This is done using a new extension field called <code>x-ibm-css</code> inside the <code>info</code> element. Just like <code>info.title</code> and <code>info.description</code>, the <code>info.x-ibm.css</code> attribute can be specified either from the <code>swaggerDefinition</code> attribute inside the <code>server.xml</code> or from annotations in a single-application scenario.
+
+There are some restrictions on the CSS format, which are documented on the corresponding <a href="https://knowledgecenters.hursley.ibm.com/liberty-refresh/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_api_discovery_swagger_def.html">Knowledge Center</a> page.
+
+Here's an example of a CSS override:
+
+[code]
+---
+swagger: '2.0'
+info:
+  title: Airline APIs
+  description: APIs to book flights and check their status
+  version: 2.1.0
+  x-ibm-css: "${server.config.dir}/custom/acme-banner.css"
+[/code]
+
+Where <code>acme-banner.css</code> is a simple CSS file that inserts a new logo and changes the top banner's background colour:
+
+[code lang="css"]
+.swagger-section #header {
+  background-image: url(images/custom-logo.png);
+  background-repeat: no-repeat;
+  background-color: whitesmoke;
+  background-position-x: 28px;
+  padding-top: 20px;
+  padding-right: 0px;
+  padding-bottom: 30px;
+  padding-left: 5px;
+}
+[/code]
+
+The customized OpenAPI UI looks like this:
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-28-at-9.57.55-AM.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-28-at-9.57.55-AM-1024x389.png" alt="Screen Shot 2017-02-28 at 9.57.55 AM" width="640" height="243" class="aligncenter size-large wp-image-21732 screenshot" /></a>
+
+<h2>Collective OpenAPI UI inline and Collective API registry</h2>
+
+The Collective OpenAPI UI has been updated to display inline the APIs from all collective members, instead of grouping them by each member. This provides an 'API first' view of the APIs in the collective. There is also a public and customizable version of the Collective UI and docs at <code>/api/collective/docs</code> and <code>/api/collective/explorer</code>, working just like the single-server scenarios outlined above.
+
+Here's a screenshot of a collective OpenAPI UI that is displaying APIs from two collective members:
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-28-at-1.58.22-PM.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-28-at-1.58.22-PM-1024x348.png" alt="Screen Shot 2017-02-28 at 1.58.22 PM" width="640" height="218" class="aligncenter size-large wp-image-21745 screenshot" /></a>
+
+As you can see from above, the APIs are displayed inline and have the same look-and-feel as a single server endpoint, even though it is displaying many different APIs from different remote servers. This is a pattern used by many companies when displaying OpenAPIs, an example being <a href="https://developer.godaddy.com/doc">GoDaddy's developer explorer</a>.
+
+We also have a new endpoint, <code>/api/collective/registry</code>, which lists all the APIs in the collective in a 'service registry' format, where only the core information about the API or service is displayed (title, description, version, and hosts that support this service). Here's an example:
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-23-at-11.42.01-AM.png"><img class="alignnone size-large wp-image-21681 screenshot" src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/02/Screen-Shot-2017-02-23-at-11.42.01-AM-1024x611.png" alt="Screen Shot 2017-02-23 at 11.42.01 AM" width="640" height="382" /></a>
+
+For more information please check out <a href="https://knowledgecenters.hursley.ibm.com/liberty-refresh/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_api_discovery_list_query.html" target="_blank">this page</a>.
+
+<h2>Proxy support</h2>
+
+To support Liberty instances behind a proxy, the OpenAPI UI and the OpenAPI docs endpoints have been updated to take into consideration HTTP headers such as <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.23">Host</a> and <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.36">Referer</a> when building its URLs. Previously the URLs would always point directly to the Liberty instance, which sometimes was in an internal IP address that could not be reached directly. Now, if there is a proxy in front of Liberty, that proxy URL is used!
+
+<h2>Built-in CORS support</h2>
+
+We made it easier to use the "Try it out" button in the collective OpenAPI by automatically configuring CORS between the collective controller's UI and the collective member's APIs. Previously users had to manually enter the CORS configuration into the <code>server.xml</code> of every collective member that they wanted to "Try it out" from the UI.
+
+<h2>Try it out!</h2>
+
+Now that you're up to date on the new enhancements from API discovery it's time to try it out!
+
+Just <a href="https://developer.ibm.com/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">download the latest Liberty runtime</a>, run <code>wlp/bin installUtility install apiDiscovery-1.0</code>, add <code>apiDiscovery-1.0</code> to your <code>server.xml</code> and start customizing your very own OpenAPI UI!

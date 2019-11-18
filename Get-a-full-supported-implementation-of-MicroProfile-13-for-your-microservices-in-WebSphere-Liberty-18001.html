@@ -1,0 +1,90 @@
+WebSphere Liberty 18.0.0.1 is now available to download with a full implementation of MicroProfile 1.3. This includes distributed tracing of microservices, a standardised way to describe your RESTful applications using OpenAPI, a type-safe approach for invoking RESTful services over HTTP, metrics for your microservices, and external configuration of your microservices. Built on <a href="https://github.com/OpenLiberty">Open Liberty</a>, this release of WebSphere Liberty also includes updates to endpoint control with MBeans, thread pool controller performance improvements, and JSON format logging.
+
+<h2>Ask questions of the development team on our free webcast</h2>
+
+If you want to learn more about WebSphere Liberty 18.0.0.1 or ask questions about it, join one of our free webcasts (choose the date that suits your timezone):
+
+<ul>
+<li><a href="https://ibm.biz/BdjW75">18 April (1-3pm ET)</a></li>
+<li><a href="https://ibm.biz/BdjW77">23 April (9-11am ET)</a></li>
+</ul>
+
+Agenda:
+
+<ul>
+<li>Part 1: Summary: Liberty value and evolution</li>
+<li>Part 2: Technical deep-dive: What’s new in Liberty this quarter</li>
+<li>Part 3: Labs with live support plus Q&amp;A</li>
+</ul>
+
+<h2>Download WebSphere Liberty 18.0.0.1 now</h2>
+
+<p class="ibm-btn-row pn-p40" style="clear:left">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download WebSphere Liberty 18.0.0.1"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download WebSphere Liberty 18.0.0.1</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+<h2>What's new in WebSphere Liberty 18.0.0.1?</h2>
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/10/OL_logomark_132_wht.png" alt="" width="262" height="191" class="alignleft size-full wp-image-23746" /></a>
+
+<p style="clear:left"></p>
+
+Everything in <a href="https://openliberty.io/news/2018/03/16/distributed-tracing-microservices-18001.html">Open Liberty 18.0.0.1</a> is available in WebSphere Liberty 18.0.0.1:
+
+<ul>
+<li>MicroProfile 1.3:
+
+<ul>
+<li>Distributed tracing with MicroProfile OpenTracing 1.0</li>
+<li>Standardised way of describing your apps with MicroProfile OpenAPI 1.0</li>
+<li>Type-safe way to call RESTful services over HTTP with MicroProfile Rest Client 1.0</li>
+<li>Metrics for your microservices with MicroProfile Metrics 1.1</li>
+<li>External configuration of your microservices with MicroProfile Config 1.2</li>
+</ul></li>
+<li>Also:
+
+<ul>
+<li>Endpoint control with MBeans</li>
+<li>Threadpool controller performance improvements</li>
+<li>JSON format logging</li>
+</ul></li>
+</ul>
+
+Take a look at the <a href="https://openliberty.io/news/2018/03/16/distributed-tracing-microservices-18001.html">Open Liberty 18.0.0.1 release blog post</a> for more information.
+
+<h2>Request for enhancements (RFEs) in WebSphere Liberty 18.0.0.1</h2>
+
+In this release, the following RFEs were completed:
+
+<ul>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewRfe&amp;CR_ID=94805">RFE 94805: Liberty JSR-352: Enable fine-grained viewing and operation of other batch jobs without requiring batchAdmin role</a>
+Find out more below.</li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewRfe&amp;CR_ID=95794">RFE 95794: Status management function for ActivationSpec</a>
+Find out more about this update in <a href="/wasdev/blog/2018/03/16/endpoints-liberty-mbeans-part2/">Fred's blog post</a>.</li>
+</ul>
+
+<div id="batchadmin" />
+
+<h2>Batch group security support</h2>
+
+This allows jobs to be assigned to groups such that users within a group can view and/or operate on a set of jobs.  This allows a more fine-grained approach to batch security than the previous alternative which required each of these users to be granted the ability to view and/or operate on all jobs (the <code>batchAdmin</code> role) in order to view and/or operate on anyone else's jobs. See the <a href="https://www.ibm.com/support/knowledgecenter/en/SS7K4U_liberty/com.ibm.websphere.wlp.zseries.doc/ae/twlp_batch_securing.html">WebSphere Liberty Knowledge Center docs</a>.
+
+<div id="wamt" />
+
+<h2>Migration Toolkit updates</h2>
+
+With <a href="/wasdev/downloads/#asset/tools-Migration_Toolkit_for_Application_Binaries">Migration Toolkit for Application Binaries</a> you can now quickly evaluate your JBoss application binaries and identify how easy it is to migrate them to IBM WebSphere Liberty or IBM WebSphere Application Server traditional. After a quick evaluation with the binary scanner, you can use the Eclipse-based migration tool for source-level evaluation and code updates where a quick fix is available.
+
+<a href="/wasdev/docs/migration-toolkit-application-binaries-tech/">What is the Migration Toolkit for Application Binaries?</a>
+
+<p class="ibm-btn-row pn-p40">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download Liberty 18.0.0.1"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download Liberty 18.0.0.1</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/09/OL_badge-1024x306.png" alt="Built on Open Liberty" width="640" height="191" class="alignleft size-large wp-image-23627" /></a>
+
+We'd love you to get involved in any way that you can, such as testing the code in ways that you use Liberty and raising issues <a href="https://github.com/openliberty/">on GitHub</a>, or create pull requests on the code and documentation. You can contribute to discussions about Open Liberty on the <a href="https://groups.io/g/openliberty">mailing list</a>.
+
+<em>Updated 2018:03:29: Added link to RFE 54747.</em>
+
+<p style="clear:left"></p>

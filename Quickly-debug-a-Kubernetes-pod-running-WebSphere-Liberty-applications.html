@@ -1,0 +1,60 @@
+I was looking for an easy way to debug a Kubernetes pod so that I could debug an application running on WebSphere Liberty in a Kubernetes deployment. I found that this works well. It should work for other servers too, as long as you know how to modify the container to get the server into debug mode.
+
+First, I decided to scale my deployment down to one pod to make it easier to debug. This ensures that all of the traffic is routed to the pod that I am debugging. I could attach debuggers to each pod, but scaling it down to one keeps it simple:
+
+<code>kubectl scale deployment &lt;deployment name&gt; --replicas 1</code>
+
+Next, I edited my deployment to put the server into debug mode:
+
+<code>kubectl edit deployment &lt;deployment name&gt;</code>
+
+or, for JSON:
+
+<code>kubectl edit deployment &lt;deployment name&gt; -o json</code>
+
+And then I modified my container specification to overwrite the container command and start the server in debug mode. One thing to keep in mind is that when you enable debug mode on Liberty, the JVM waits for a debugger to attach before it will actually start the server.
+
+[code language="text" highlight="5,6,7,8,9"]
+      containers:
+      - image: web1-liberty
+        imagePullPolicy: IfNotPresent
+        name: web1-liberty
+        command:
+        - /opt/ibm/docker/docker-server
+        - /opt/ibm/wlp/bin/server
+        - debug
+        - defaultServer
+        ports:
+        - containerPort: 9080
+          protocol: TCP
+[/code]
+
+I saved my changes and then used port forwarding to make the debug port available on my host machine. First get the pod name:
+
+<code>kubectl get pods</code>
+
+Then forward the debug port. I used <code>17777</code> for the host port but any free port can be used. The default debug port for Liberty is <code>7777</code>:
+
+<code>kubectl port-forward &lt;pod name&gt; 17777:7777</code>
+
+Because my original application source was in Eclipse, I created an Eclipse Remote Java Application launch configuration (<strong>Debug menu > Debug Configurations > Remote Java Application</strong>). If your application consists of several projects, use the <strong>Source</strong> tab to add them to the source lookup:
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/09/remoteJavaLauncher.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/09/remoteJavaLauncher.png" alt="" width="692" height="505" class="aligncenter size-full wp-image-23580" /></a>
+
+After attaching the debugger, I used the <code>kubectl logs</code> command to check that the server was now up:
+
+<code>kubectl logs &lt;pod name&gt;</code>
+
+And then I was up and debugging: setting breakpoints, using hot code replace to test out changes, etc!
+
+After I was done, I restored my deployment to its original state by doing the reverse of what I did to debug it:  First I detached the debugger, then terminated the port forwarding (<code>Ctrl C</code> in the command window where I started it), and then I edited the deployment and removed the <code>command</code> entry:
+
+<code>kubectl edit deployment &lt;deployment name&gt;</code>
+
+And then scaled up the deployment to the original number of replicas:
+
+<code>kubectl scale deployment &lt;deployment name&gt; --replicas &lt;number of replicas&gt;</code>
+
+One thing to remember is that any changes made using hot code replace are no longer in the deployment because it will revert back the the original classes.
+
+And that's all there was to it!

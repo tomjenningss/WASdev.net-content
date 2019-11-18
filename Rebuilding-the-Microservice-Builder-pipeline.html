@@ -1,0 +1,35 @@
+<a href="/microservice-builder/">Microservice Builder</a>, which was <a href="/wasdev/blog/2017/06/22/announcing-microservice-builder/">released in June</a>, is an end-to-end user experience for rapidly developing and deploying containerized Java microservices. We've made a number of improvements to the scalability and the flexibility of the Microservice Builder pipeline since the March beta.
+
+The <em>pipeline</em> is <a href="https://jenkins.io/">Jenkins</a>, in a customized <a href="https://www.docker.com/">Docker</a> image. The beta version had the GitHub integration that we wanted but lacked support for <a href="https://wiki.jenkins-ci.org/display/JENKINS/Distributed+builds">distributed builds</a> and included a fixed level of <a href="https://maven.apache.org/">Maven</a>, Docker, and <a href="https://kubernetes.io/docs/user-guide/kubectl-overview/">kubectl</a>. The solution to that lack of scalability and flexibility was to make better use of <a href="https://kubernetes.io/">Kubernetes</a>.
+
+Jenkins must run multiple builds at once. A basic Jenkins installation has a pool of <em>executors</em> to delegate individual builds to. These executors run as threads inside the main process and can consume a lot of memory and CPU. A single Jenkins instance can suffer if it has 'too few' or 'too many' executors: There's no correct number. Instead Jenkins should be scaled using its master/slave support. A single Jenkins master should run no builds itself but instead delegate to one or more slave nodes, running as separate processes. Microservice Builder's Jenkins runs in a Docker container on Kubernetes: How best should a master/slave Jenkins topology run in that environment?
+
+It turns out that there's a <a href="https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin">Kubernetes plugin for Jenkins</a> that has an answer: Each job runs in a new slave, dynamically provisioned by Kubernetes. Each slave only lasts as long as the job it's running. The plugin is not simple to configure but there is a <a href="https://github.com/kubernetes/charts/tree/master/stable/jenkins">Helm chart</a> that does this so well that we re-based the Microservice Builder pipeline on to that chart.
+
+The Jenkins Kubernetes plugin gives us more than just scalability: It provides a way to remove all the extra utilities like Maven, Docker, and kubectl from the master Jenkins image. Each slave is a Kubernetes pod, a collection of multiple Docker containers. The Jenkins Kubernetes plugin provides a syntax for running build steps in different containers--and handles the work of mounting the build directory into each of them. Our standard pipeline comprises a number of steps:
+
+<ol>
+    <li>Check the code out with Git.</li>
+    <li>Build the code: <code>mvn clean package</code></li>
+    <li>Run <code>docker build</code> to put the packaged output into a container.</li>
+    <li>Use <code>kubectl apply</code> to deploy the result to Kubernetes.</li>
+</ol>
+
+The Docker images required for the Maven, Docker, and kubectl steps are all to be specified in the <a href="https://jenkins.io/doc/book/pipeline/jenkinsfile/">Jenkinsfile</a>. They are conveniently separated from the master image and can be defined on a per-Git repository basis. The final step was to extract all the new code into a <a href="https://jenkins.io/doc/book/pipeline/shared-libraries/">shared library</a> allowing us to compress our standard Jenkinsfile to:
+
+[code language="groovy"]
+@Library('MicroserviceBuilder') _
+microserviceBuilderPipeline {
+  image = 'microservice-vote'
+}
+[/code]
+
+You can provide additional parameters to override the default images. For example, you could change the default Maven from Java 8 to Java 7 by specifying the following line in the Jenkinsfile:
+
+[code lang="text"]
+mavenImage = &#039;maven:3.5.0-jdk-7&#039;
+[/code]
+
+The default Jenkinsfile specifies that <code>microserviceBuilderPipeline.groovy</code> should be obtained from the <code>MicroserviceBuilder</code> library. We've made this a parameter on our pipeline Helm chart. By default, the library points to the <a href="https://github.com/WASdev/microservicebuilder.lib">microservicebuilder.lib repo</a>. The Groovy is in the <a href="https://github.com/WASdev/microservicebuilder.lib/blob/master/vars/microserviceBuilderPipeline.groovy"><code>vars/</code> directory</a> but the entire library can be replaced using the <code>Pipeline.Template.RepositoryUrl</code> parameter on our chart. For more details, see the <a href="https://www.ibm.com/support/knowledgecenter/SS5PWC/jenkinsfile_reference.html">Knowledge Center</a>. Customers needing to run builds in environments disconnected from the Internet can use this to fork our library into their in-house source control, for example.
+
+Overall, the Jenkins Kubernetes plugin and its associated Helm chart have greatly helped us make our Microservice Builder pipeline scale with Kubernetes, and flexible enough to deal with a broad range of customer scenarios. Let us know what you think in the comments below!

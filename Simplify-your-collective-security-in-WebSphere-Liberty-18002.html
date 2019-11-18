@@ -1,0 +1,62 @@
+<a href="/wasdev/blog/2018/06/29/java-ee-8-liberty-18-0-0-2/">WebSphere Liberty 18.0.0.2</a> introduces significant improvements to the SSH host authentication model for collectives. While previously each member required its own SSH key pair, now the entire collective can be configured to share just one pair of keys. For z/OS users, SAF support has also been added. 
+<h2>What’s changed</h2> 
+By default, members no longer generate individual SSH key pairs. Instead, when a controller is created, it generates a single SSH key pair for use throughout the collective. When joining, members receive the public key from the controller and add it to their <code>authorized_keys</code> file. That’s all there is to it. 
+
+As an alternative to auto-generating this single collective-wide key pair, the controller can be configured to use a preexisting key pair or a SAF keyring for z/OS. 
+<h2>Why is it better</h2>
+One SSH key pair versus potentially thousands. This simplifies security and administration and is a safer, more standard way to go. Additionally, private keys are no longer stored in the collective file system repository. 
+
+For z/OS, SAF is the more secure and standard approach for security, making collectives production ready. 
+<h2>How do you use it</h2>
+Follow the normal process for creating a collective. By default, the single collective-wide SSH key pair will be used. 
+
+As previously mentioned, a preexisting key pair or SAF keyring can be used rather than the auto-generated key pair. This is referred to as a bring-your-own (BYO) key scenario. When creating your controller, simply specify the paths to the desired public and private SSH key in the CLI command:
+
+
+<pre>wlp/bin/collective create controller --keystorePassword=controllerKSPassword --sshPublicKey="/path/to/public/key" --sshPrivateKey="/path/to/private/key"</pre>
+
+A new <code>collectiveHostAuthInfo</code> configuration element appears in the generated XML. Add this to your <code>server.xml</code> so that the controller uses the specified keys:
+
+[code lang="xml"] <collectiveHostAuthInfo sshPrivateKeyPath="/path/to/private/key"
+                                          sshPublicKeyPath="/path/to/public/key" /> [/code]
+
+For z/OS, you can specify a SAF keyring and certificate label as follows:
+
+<pre>wlp/bin/collective create controller --keystorePassword=controllerKSPassword --safKeyring="safkeyring:///MY.KEYRING" --safCertificateLabel="MY Label123"</pre>	
+
+
+Replicating your controller seamlessly propagates this behavior to all replicas. If using a default auto-generated key pair, the keys are copied to each replica system when the CLI collective replicate command is issued. If using BYO keys or a SAF keyring, the keys need to be manually copied to the new system. 
+<h2>Using the old individual key pair behavior</h2>
+If a single collective-wide SSH key pair just isn’t for you, no problem. The old behavior of each member having its own SSH key pair is always available. It’s important to note that the single collective-wide key pair model is just another remote configuration option that happens to now be the new default. Controllers always create this collective-wide key pair and make it available but it's up to each member to decide whether to use it or not. Individual member keys and RPC username/password are still valid configurations for members. 
+
+To have a member generate its own SSH key pair simply specify <code>useCollectiveSSHKey=false</code> on the collective join command:
+
+<pre>wlp/bin/collective join member --controller=admin:password@host:port --keystorePassword=memberKSPassword --useCollectiveSSHKey=false</pre>
+
+The generated XML includes a new flag in the <code>hostAuthInfo</code> element:
+
+[code lang="xml"] <hostAuthInfo useCollectiveSSHKey="false" /> [/code]
+
+As mentioned, the new default behavior is for members to use the single collective-wide key pair. However, if for some reason this key pair is not available (controller is misconfigured, downlevel, or keys are not available), members will “fall back” to using the old individual key pair behavior. This keeps your collective going. Once the single collective-wide key pair is available, the member starts using it after it restarts. 
+
+To disable this fall back mechanism and require the member to use the single collective-wide SSH key pair, specify <code>useCollectiveSSHKey=true</code> on the collective join command:
+
+<pre>wlp/bin/collective join member --controller=admin:password@host:port --keystorePassword=memberKSPassword --useCollectiveSSHKey=true</pre>
+
+<h2>Considerations when migrating</h2>
+What happens if you already have a collective and migrate to 18.0.0.2? If you have a single controller (not in a replica set), your collective automatically switches over to the single collective-wide SSH key pair model. Once started on 18.0.0.2, the controller detects this new behavior and makes it available to members. Any member running on 18.0.0.2 begins using the collective-wide key pair and members on previous fixpacks simply use the old behavior. 
+
+If your controller is part of a replica set, there is no auto-upgrading to use the single collective-wide key pair. Your collective continues to run with this new function disabled. This prevents a multitude of problems that could occur when trying to have all existing replicas coordinate which key pair to use as the single collective-wide SSH key pair. But not to worry! You can easily switch your replica over to the single key pair model with a few steps:
+
+1. Make sure there is only one active replica. Run <code>removeReplica</code> from the collective CLI to move an active replica to standby mode.
+
+2. Once there is only one active replica, stop all members and controllers.
+
+3. Configure all controllers with BYO keys (SSH or SAF). If using BYO SSH keys, copy the same SSH key pair to each of the replica systems. For SAF, make sure the keyring is accessible from each system. Add the following config to each replica controller (SSH keys shown in the example):
+
+[code lang="xml"] <collectiveHostAuthInfo sshPrivateKeyPath="/path/to/private/key"
+                                          sshPublicKeyPath="/path/to/public/key" /> [/code]
+
+4. Start just the one active controller. This allows the controller to post the single collective-wide public SSH key in the collective repository for reference by the other replicas. 
+
+5. Start the other controllers and members and re-add any replicas to the active replica set. 

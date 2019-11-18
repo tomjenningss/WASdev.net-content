@@ -1,0 +1,308 @@
+Here's the latest WebSphere Liberty beta and WebSphere Developer Tools (WDT).
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2017/06/13/new-release-websphere-liberty-17-0-0-2/">in June</a>.
+
+Look out for more betas over the coming months.
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<h2>What’s in the WebSphere Liberty beta for June?</h2>
+
+<h3>OpenAPI v3 feature</h3>
+
+This is a new feature which starts to implement the official <code>OpenAPI 3.0</code> specification. This specification is the next version of the popular Swagger v2 documentation, and has included many enhancements that REST API developers have been asking for, such as the support for callbacks, multiple server locations and a broader set of JSON schema components.
+
+Now you can use pre-generated Swagger v2 or OpenAPI v3 documents (<code>swagger.yaml</code>/<code>swagger.json</code> and <code>openapi.yaml</code>/<code>openapi.json</code> respectively) inside their module's <code>META-INF</code>, or use the new OpenAPI v3 programming model interface, <code>io.swagger.oas.web.OpenAPIController</code>.
+
+To use this feature, users can provide a file called <code>openapi.yaml</code> (or <code>openapi.yml</code>/<code>openapi.json</code>) with their OAS document inside their web module's <code>META-INF folder</code>. Here's an example:
+
+[code]
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Sample API
+  description: A simple sample of an OpenAPI v3 document
+  contact:
+    name: Liberty API Team
+    email: arthurdm@ca.ibm.com
+    url: https://github.com/microservices-api/websphere-connect
+  license:
+    name: Apache 2
+paths:
+  /pets:
+    get:
+      description: |
+        Returns all pets from the system that the user has access to
+      operationId: findPets
+      parameters:
+        - name: tags
+          in: query
+          description: tags to filter by
+          required: false
+          style: SIMPLE
+          schema:
+            type: array
+            items:
+              type: string
+        - name: limit
+          in: query
+          description: maximum number of results to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /pets/{id}:
+    get:
+      description: Returns a user based on a single ID, if the user does not have access to the pet
+      operationId: find pet by id
+      parameters:
+        - name: id
+          in: path
+          description: ID of pet to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+components:
+  schemas:
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+[/code]
+
+Alternatively, users may provide a file called <code>io.swagger.oas.web.OpenAPIController</code> inside their web module's <code>META-INF/services</code> folder, which contains the qualified name of an implementation of the OpenAPIController interface. In the sample below, that would be <code>com.example.AirlinesAPIs</code>. Using the OpenAPIController interface users can programmatically build a complete OpenAPI v3 model (instead of creating the document using a text editor).
+
+[code language="java"]
+package com.example;
+
+public final class AirlinesAPIs implements OpenAPIController {
+
+   @Override
+   public OpenAPIConfig bootstrap() {
+      OpenAPI oai = new OpenAPI().info(new Info().title("Airlines").version("1.0.0")).paths(new Paths()
+         .addPathItem("/airlines",new PathItem()
+            .get(new Operation()
+               .description("Get the list of available airlines")
+               .responses(new ApiResponses()
+                  .addApiResponse("200", new ApiResponse()
+                     .description("successful")
+                     .content(new Content()
+                        .addMediaType("application/json", new MediaType()
+                        .schema(new Schema().ref(
+                           "#/components/schemas/Airlines")))))))));
+                     
+      return new OpenAPIConfig().setOpenAPI(oai);
+   }
+}
+[/code]
+
+Please see the <a href="https://www.openapis.org/">Open API Initiative</a> and the <a href="https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/README.md">Open API GitHub page</a> for more information.
+
+<h3>JSON-B v1.0 feature</h3>
+
+The <code>jsonb-1.0</code> feature provides a preview of the JSON Binding (JSON-B) 1.0 specification interfaces, as well as the reference implementation (Eclipse Yasson).
+
+JSON technology has proven to be a powerful tool in modern Java EE applications, especially when using a Microservices oriented architecture. Traditionally applications had to provide their own JSON binding implementations and package them in a shared library or application. With the <code>jsonb-1.0</code> feature, the specification interfaces and implementation are provided out of the box, ready to be used directly by applications.
+
+To use this feature, simply enable <code>jsonb-1.0</code> in the <code>server.xml</code>. Please see the <a href="http://json-b.net/">JSON-B</a> page for more information.
+
+<h3>Auditing the security infrastructure</h3>
+
+You can use the Liberty Audit feature to report and track auditable events to ensure the integrity of your configured environment.
+
+The Liberty Audit feature introduces an infrastructure which serves two purposes:
+
+<ul>
+<li>Confirming the effectiveness and integrity of the existing configuration</li>
+<li>Identifying areas where improvement to the configuration may be needed</li>
+</ul>
+
+The Liberty Audit feature has the ability of capture the following auditable events:
+
+<ul>
+<li>Basic authentication</li>
+<li>Management of the audit service</li>
+<li>Form login authentication</li>
+<li>Client certificate authentcation</li>
+<li>Servlet runAs delegation</li>
+<li>Failover to basic authentication</li>
+<li>Unprotected servlet authorization</li>
+<li>Servlet 3.0 APIs: login/logout/authenticate</li>
+<li>JACC web authorization</li>
+<li>JASPI authentication</li>
+<li>Form logout</li>
+<li>JACC EJB authorization</li>
+<li>EJB delegation</li>
+<li>SCIM operations/member management</li>
+<li>Dynamic audit feature handling</li>
+<li>EJB authorization</li>
+</ul>
+
+This feature provides a default implementation, the AuditFileHandler, which emits audit records to a file-based log in JSON format.
+Procedure:
+
+<ol>
+<li>Add the <code>audit-1.0</code> feature to the <code>server.xml</code> file. Note that currently the feature requires that the <code>appSecurity-1.0</code> or <code>appSecurity-2.0</code> feature also be present.</li>
+<li>If you wish to customize the Audit File Handler configuraton, specify the <code>auditFileHanlder</code> entry for the server.
+Note that if you do not specify the <code>auditFileHandler</code> entry, then all of the defaults will apply, and all audit events and possible outcome types will be recorded.</li>
+</ol>
+
+[code language="xml"]
+	<auditFileHandler 
+		maxFiles="5"
+		maxFileSize="20”
+		logDirectory=”c:/audit/logs”>
+	    <events name="AuditEvent_1" eventName="SECURITY_AUDIT_MGMT" outcome="SUCCESS"/>   
+	    <events name="AuditEvent_2" eventName="SECURITY_AUTHN" outcome="SUCCESS"/>   
+       </auditFileHandler>
+[/code]
+
+The following configuration options are supported by the Liberty Audit feature:
+
+<ul>
+<li><code>maxFiles</code> - defines the maximum number of file-based audit logs that will be kept before the oldest log is written over. If <code>maxFiles</code> is not specified, the default value of 100 is used</li>
+<li><code>maxFileSize</code> - the maximum size, in MB, of each audit log. If <code>maxFileSize</code> is not specified, a default size of 20 MB is used for each audit log</li>
+<li><code>logDirectory</code> - the location of the audit log. If <code>logDirectory</code> is not specified, the location defaults to <code>WLP_OUTPUT_DIR/serverName/logs</code></li>
+</ul>
+
+<table style=”text-align: center; height: 152px;” border=”1″ cellspacing=”0″ cellpadding=”0″ width=”390″>
+<tbody>
+
+<tr style=”background-color: #e9e9e9; font-weight:bolder;”>
+<td><strong>Audit instrumentation</strong></td>
+<td><strong>Audit event name</strong></td>
+</tr>
+
+<tr>
+<td>Basic authentication</td>
+<td>SECURITY_AUTHN</td>
+</tr>
+
+<tr>
+<td>Management of the audit service</td>
+<td>SECURITY_AUDIT_MGMT</td>
+</tr>
+
+<tr>
+<td>Form login authentication</td>
+<td>SECURITY_SESSION_LOGIN</td>
+</tr>
+
+<tr>
+<td>Client certificate authentication</td>
+<td>SECURITY_AUTHN</td>
+</tr>
+
+<tr>
+<td>Servlet runAs delegation</td>
+<td>SECURITY_AUTHN_DELEGATION</td>
+</tr>
+
+<tr>
+<td>Failover to basic authentication</td>
+<td>SECURITY_AUTHN_FAILOVER</td>
+</tr>
+
+<tr>
+<td>Unprotected servlet authorization </td>
+<td>SECURITY_AUTHZ</td>
+</tr>
+
+<tr>
+<td>Servlet 3.0 APIs: login/logout/authenticate</td>
+<td>SECURITY_API_AUTHN (for login, authenticate) 
+SECURITY_API_AUTHN_TERMINATE (for logout)
+</td>
+</tr>
+
+<tr>
+<td>JACC web authorization</td>
+<td>SECURITY_AUTHZ</td>
+</tr>
+
+<tr>
+<td>JASPI authentication</td>
+<td>SECURITY_AUTHN</td>
+</tr>
+
+<tr>
+<td>Form logout</td>
+<td>SECURITY_SESSION_LOGOUT</td>
+</tr>
+
+<tr>
+<td>JACC EJB authorization</td>
+<td>SECURITY_AUTHZ</td>
+</tr>
+
+<tr>
+<td>EJB delegation</td>
+<td>SECURITY_AUTHZ_DELEGATION</td>
+</tr>
+
+<tr>
+<td>SCIM operations/member management</td>
+<td>SECURITY_MEMBER_MGMT</td>
+</tr>
+
+<tr>
+<td>EJB authorization</td>
+<td>SECURITY_AUTHZ</td>
+</tr>
+
+</tbody>
+</table>
+
+Supported outcomes: <code>SUCCESS</code>, <code>FAILURE</code> and <code>REDIRECT</code> (for redirected authentication calls).
+
+<h3>Admin Center feature update</h3>
+
+On the Dashboard of the Java Batch tool in Admin Center, the <code>Server</code> column has been replaced by three new columns: <code>Server Name</code>, <code>User Directory</code>, and <code>Host</code>.
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/june-beta-2.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/june-beta-2.png" alt="" width="1242" height="478" class="alignnone size-full wp-image-22838" /></a>
+
+<h3>MicroProfile Config feature</h3>
+
+With the <code>mpConfig-1.0</code> feature, you can directly use the Config APIs to retrieve configuration without the need to know where the properties are defined. The properties can be dynamically updated and then retrieved by the applications without the application restarting. The configuration can be located in multiple sources, and has a priority system. If the same property is specified in multiple config sources, the value from the config source with the highest priority will be used. The properties can be overwritten by users in different environments.
+
+<h3>MicroProfile Fault Tolerance feature</h3>
+
+With the <code>mpFaultTolerance-1.0</code> feature, you can make the service invocation resilient via retry, fallback, timeout, circuit breaker and bulkhead functionalities. If a service invocation fails, a retry can be performed. After some retries, a fallback operation can be specified. Indefinite waiting is no longer a problem as the timeout can be specified on service invocation. Repeating timeouts are solved by the functionality of the circuit breaker. You will not need to package fault tolerance libraries into your applications any more.
+
+<h2>What’s already in there?</h2>
+
+The May Liberty beta included the Social Login feature, an update to the Transport Security feature, an update to the API Discovery feature and an Enhancement to the Java Batch Tool on the Admin Center.
+
+Take a look at the previous beta announcements for a full list of stuff added since the <a href="/wasdev/blog/2016/06/24/websphere-liberty-and-tools-16-0-0-2-release/">16.0.0.2</a> release in June 2016:
+
+<ul>
+<li><a href="wasdev/blog/2017/05/12/beta-websphere-liberty-tools-may-2017/">May 2017 beta</a></li>
+<li><a href="/wasdev/blog/2017/04/13/beta-websphere-liberty-tools-april-2017/">April 2017 beta</a></li>
+<li><a href="/wasdev/blog/2017/03/14/beta-websphere-liberty-tools-march-2017/">March 2017 beta</a></li>
+<li><a href="/wasdev/blog/2017/02/17/beta-websphere-liberty-tools-february-2017/">February 2017 beta</a></li>
+<li><a href="/wasdev/blog//2017/01/20/beta-websphere-liberty-tools-january-2017/">January 2017 beta</a></li>
+<li><a href="/wasdev/blog/2016/12/16/beta-websphere-liberty-and-tools-december-2016/">December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/11/18/beta-websphere-liberty-and-tools-novemberdecember-2016/">November/December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/10/21/beta-websphere-liberty-and-tools-november-2016/">November 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/09/23/beta-websphere-liberty-and-tools-october-2016/">October 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/08/26/beta-websphere-liberty-and-tools-september-2016/">September 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/07/28/beta-websphere-liberty-and-tools-august-2016/">August 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/30/beta-websphere-liberty-and-tools-july-2016/">July 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/03/beta-websphere-liberty-and-tools-june-2016/">June 2016 beta</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

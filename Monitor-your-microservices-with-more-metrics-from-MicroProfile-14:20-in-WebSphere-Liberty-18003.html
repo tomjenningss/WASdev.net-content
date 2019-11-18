@@ -1,0 +1,276 @@
+Get more metrics from your apps and servers so you can monitor your microservices more effectively with MicroProfile 1.2 and 2.0 in WebSphere Liberty 18.0.0.3. You can now get metrics to monitor the fault tolerance responses of your microservices and collect metrics from your microservices in IBM Cloud. There's also support now for reactive programming in a type-safe RESTful client, you can dynamically update your microservices configuration, and much more.
+
+Take a look and see...  <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a> includes full support for both MicroProfile 1.4 with Java EE 7 and MicroProfile 2.0 with Java EE 8 and is now available to download. WebSphere Liberty is built on the open source <a href="https://openliberty.io/blog/2018/09/19/get-more-metrics-microprofile20.html">Open Liberty project</a>.
+
+
+<h2>Join our free webcast</h2>
+
+Learn about Liberty V18.0.0.3, try it out, and ask questions of the team (choose the date that suits your timezone):
+
+<ul>
+<li><a href="http://ibm.biz/LibertyVpot1">17 October, 2018 (1-3pm ET | 5-7pm UTC)</a></li>
+<li><a href="http://ibm.biz/LibertyVpot2">7 November, 2018 (9-11am ET | 1-3pm UTC)</a></li>
+</ul>
+
+
+<h2>Download WebSphere Liberty 18.0.0.3 now</h2>
+
+<p class="ibm-btn-row pn-p40" style="clear:left">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download WebSphere Liberty 18.0.0.3"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download WebSphere Liberty 18.0.0.3</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+<h2>What's new in WebSphere Liberty 18.0.0.3?</h2>
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/10/OL_logomark_132_wht.png" alt="" width="262" height="191" class="alignleft size-full wp-image-23746" /></a>
+
+<p style="clear:left"></p>
+
+WebSphere Liberty is built on Open Liberty so <a href="https://openliberty.io/blog/2018/09/19/get-more-metrics-microprofile20.html">everything new in Open Liberty</a> is here too:
+<ul>
+<li>Monitor faults in your microservices (MicroProfile Fault Tolerance 1.1)</li>
+<li>Get Liberty component metrics from <code>/metrics</code> endpoint (Monitor 1.0 with MP Metrics 1.1)</li>
+<li>Disable authenticaton on <code>/metrics</code> during development (MicroProfile Metrics 1.1 update)</li>
+<li>Reactive programming in a type-safe RESTful client (MicroProfile Rest Client 1.1)</li>
+<li>Verify security tokens in a container-neutral way to simplify deployment (MicroProfile JWT 1.1)</li>
+<li>Automatically trace JAX-RS requests between microservices (MicroProfile Open Tracing 1.1)</li>
+<li>Dynamically update your microservice configuration (MicroProfile Config 1.3)</li>
+<li>Conveniently enable all MicroProfile 2.0 or MicroProfile 1.4 features</li>
+<li>Provide social media single sign-on options to app users (Social Login 1.0)</li>
+<li>Use a java.sql.Driver as a data source (JDBC 4.2, 4.1, 4.0)</li>
+</ul>
+
+Find out more on the <a href="https://openliberty.io/blog/2018/09/19/get-more-metrics-microprofile20.html">Open Liberty website</a>.
+
+
+Plus, only in WebSphere Liberty:
+
+<ul>
+<li><a href="#monitor">Collect metrics from your microservices in IBM Cloud</a></li>
+<li><a href="#audit">Ensure integrity and accountability in your business computing environment (Audit 1.0)</a></li>
+<li><a href="#logstash">Collect audit data in logs for analysis (Logstash Collector 1.0)</a></li>
+<li><a href="#pluginutility">Update to the pluginUtility merge command</a></li>
+<li><a href="#serverpkg">Specify a root directory when packaging servers</a></li>
+<li><a href="#zosWLM">Get Liberty support for MDBs (z/OS WLM 1.0)</a></li>
+<li><a href="#zosWLMhealth">Configure Liberty to interact with z/OS WLM Health APIs (z/OS WLM 1.0)</a></li>
+<li><a href="#usagemeter">Submit usage metrics from a Liberty server to IBM Cloud Private</a></li>
+</ul>
+
+
+
+
+<div id="monitoring">
+<h3>Collect metrics from your microservices in IBM Cloud</h3>
+
+A new option for accessing <code>/metrics</code> without authentication makes it easier for developers and administrators to set up monitoring of Liberty servers in situations where security isn't required. Tools such as Prometheus or Collectd can be set up quickly to scrape metrics from Liberty.
+
+MicroProfile Metrics in Liberty provides metrics for application developers and administrators to monitor their applications. Metrics are often collected and stored in a time series database such as Prometheus. Previously, the <code>/metrics</code> endpoint provided by Liberty required basic authentication. Administrators needed to add the username and password to Prometheus's configuration in order for Prometheus to scrape the metrics from Liberty.
+
+An optional configuration attribute is now available to turn off the basic authentication of the <code>/metrics</code> endpoint. This makes metrics collection in IBM Cloud Private a lot easier. Prometheus can automatically discover Liberty's <code>/metrics</code> endpoint without modifying its configuration.
+
+To turn off basic authentication for the <code>/metrics</code> endpoint, add <mpMetrics authentication="false"/> to <code>server.xml</code>.
+
+In IBM Cloud Private, if you select the Monitoring checkbox in the Liberty Helm chart, <code>mpMetrics-1.1</code> and <code>monitor-1.0</code> feature are added to <code>server.xml</code> with authentication disabled for the <code>/metrics</code> endpoint. In additional, an enhancement in 18.0.0.3 exposes metrics from <code>monitor-1.0</code> to MicroProfile Metrics vendor scope. Metrics such as <code>servlet</code> and <code>thread pool</code> statistics are included in <code>/metrics</code> and <code>/metrics/vendor</code> endpoints.
+
+For more info, see the Knowledge Center:
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_mp_metrics_monitor.html">Monitoring with MicroProfile metrics</a></li>
+<li><a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/rwlp_monitor_metrics_rest_api.html">MicroProfile Metrics 1.1 vendor metrics</a></li>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_monitor10.html">Monitoring with monitor-1.0</a></li>
+</ul>
+
+</div>
+
+<div id="audit">
+<h3>Ensure integrity and accountability in your business computing environment (Audit 1.0)</h3>
+
+The audit feature provides a mechanism to:
+
+<ul>
+<li> Ensure the integrity of the business computing environment, including providing evidence for non-repudiation</li>
+<li> Promote user accountability</li>
+<li> Do incident investigation and vulnerability analysis</li>
+<li> Support compliance requirements many large customers have to provide and maintain security audit and business transaction records over long periods of time for regulatory reasons</li>
+</ul>
+
+To enable auditing capability, add the <code>audit-1.0</code> feature to the <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+        <feature>audit-1.0</feature>
+</featureManager>
+[/code]
+
+<!--For more info, see the Knowledge Center:
+<ul>
+<li><a href="TODO">TODO</a></li>
+</ul>-->
+
+</div>
+
+<div id="logstash">
+<h3>Collect audit data in logs for analysis (Logstash Collector 1.0)</h3>
+
+Liberty administrators can now see audit data in their logs and analyze it using popular log analysis tools like the Elastic stack. For example, this will help quickly pinpoint attempts to access resources by unauthorized users, view the scope of user activity across a set of Liberty servers, or highlight attempts to use a compromised user ID.
+
+The new <code>audit-1.0</code> feature is able to track authentication, authorization, and other events within the Liberty server. Diagnosing issues in real time is hard to do by just looking at a stream of audit events in a file. When <code>audit-1.0</code> is enabled, audit events can now be forwarded to Logstash using <code>logstashCollector-1.0</code> feature or can be written to <code>stdout</code> by changing the settings in the <code>server.xml</code> logging element. As a result, audit events from multiple Liberty servers can be aggregated to an Elastic logging stack or other log analysis solution similar to log events. For servers running in IBM Cloud Private, Liberty's audit events from each pod will be collected and forwarded to the built-in Elastic logging stack. Administrators can analyze the audit events to find and investigate suspicious activity on their servers.
+
+Enable logging in JSON to <code>stdout</code> or change the format of <code>messages.log</code> to JSON.
+
+For example, you enable writing JSON formatted audit and message events to <code>stdout</code> by setting the following in <code>server.env</code>:
+
+<pre>WLP_LOGGING_CONSOLE_FORMAT=json
+WLP_LOGGING_CONSOLE_LOGLEVEL=info
+WLP_LOGGING_CONSOLE_SOURCE=audit,message</pre>
+
+You can use <code>logstashCollector-1.0</code> in conjunction with the <code>audit-1.0</code> feature to forward audit events to a Logstash server. Example server configuration:
+
+[code lang="xml"]
+<featureManager>
+        <feature>audit-1.0</feature>
+        <feature>logstashCollector-1.0</feature>
+</featureManager>
+
+<logstashCollector 
+	source="audit" 
+	hostName="logstashHostname" 
+	port="5043" 
+	sslRef="mySSLConfig"
+</logstashCollector>
+[/code]
+
+For more info, see the Knowledge Center:
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/rwlp_logging.html">Enabling JSON logging</a></li>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_analytics_logstash.html">Enabling Logstash Collector</a></li>
+</ul>
+
+</div>
+
+
+<div id="pluginutility">
+<h3>Update to the pluginUtility merge command</h3>
+
+It is common to provide workload balancing and failover of application requests by running the same application in multiple application server processes, a pattern referred to as an application cluster. In such a topology, the web server plug-in must share the requests across all the application servers in the cluster, and it can be directed to do so by using a configuration that contains information about all of the application servers. This configuration is known as a merged plug-in configuration because it involves merging routing information from multiple application servers. You can use the <code>pluginUtility</code> command to collect the automatically generated plug-in configuration files and merge them.
+
+As requested by users, the <code>pluginUtility merge</code> tool now works with just one source input file. This change allows for simpler use and automation of the tool. Users can now invoke the <code>merge</code> command with just one plugin configuration file as input; the command now generates a merged plugin configuration file given just one input file. In previous releases, the tool would return an error code if fewer than two files were requested to be merged. This change allows the tool to behave more predictably for a wider range of input scenarios.
+
+Run <code>pluginUtility merge --sourcePath=PLUGIN_DIR</code> with just one plugin configuration file in <code>PLUGIN_DIR</code>. A merged configuration file is created.
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2018/09/pluginutility.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2018/09/pluginutility.png" alt="pluginUtility command run successfully." width="967" height="212" class="aligncenter size-full wp-image-24740" /></a>
+
+For more info, see the Knowledge Center:
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_admin_pluginutility.html">Merging web server plug-in configuration files from the command line</a></li>
+</ul>
+
+</div>
+
+<div id="serverpkg">
+<h3>Specify a root directory when packaging servers</h3>
+When packaging a server from the command line using the <code>server package</code> command, you can now optionally specify the Liberty root directory in the archive. This enables you to extract the archive into your directory structure and not have to manually modify it to fit your naming scheme. 
+
+For example, to obtain an archive called <code>myServerPackage.zip</code> which contains the archived Liberty server with the folder structure <code>/MyRoot/...</code> instead of <code>/wlp/...</code>, run the command:
+
+<pre>server package myServer --archive=myServerPackage.zip --server-root=MyRoot</pre>
+
+For more info, see the Knowledge Center:
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_setup_package_server.html">Packaging a Liberty server from the command line</a></li>
+</ul>
+
+</div>
+
+
+<div id="zosWLM">
+<h3>Get Liberty support for MDBs (z/OS WLM 1.0)</h3>
+
+z/OS System Programmers can now assign MDB work to z/OS WLM services and report classes so that they can monitor response times and other related information about MDB workload relative to SLA (Service Level Agreement) goals defined in z/OS WLM.
+
+To enable the support, add the <code>zosWlm-1.0</code> feature and defining MDB classification rules in the configuration. For example:
+
+[code lang="xml"]
+<server>
+    <featureManager>
+        <feature>zosWlm-1.0</feature>
+    </featureManager>
+    ...
+    <wlmClassification>
+       <mdbClassification transactionClass="CLASMDB1" jmsActivationSpec="Banking/personal/deposit"/>
+      ....
+       <mdbClassification transactionClass="CLASMDBN" jmsActivationSpec="*"/>
+    </wlmClassification>
+...
+</server>
+[/code]
+
+
+
+For more info, see the Knowledge Center:
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/SS7K4U_liberty/com.ibm.websphere.wlp.zseries.doc/ae/rwlp_wlmclassification.html">WLM classification for z/OS</a></li>
+</ul>
+
+</div>
+
+
+<div id="zosWLMhealth">
+<h3>Configure Liberty to interact with z/OS WLM Health APIs (z/OS WLM 1.0)</h3>
+
+The new support added to leverage z/OS WLM Health APIs allows z/OS work routing mechanisms that consider z/OS WLM advice (e.g. Sysplex Distributor) to gradually increase work to a newly started server so that overall response times are not adversely affected by starting a new server.
+
+To enable z/OS WLM 1.0, add the definition to your <code>server.xml</code>:
+
+[code lang="xml"]
+<server>
+    <featureManager>
+        <feature>zosWlm-1.0</feature>
+    </featureManager>
+    ...
+    <zosWlmHealth interval="1m" increment="15"/> 
+</server>
+[/code]
+
+For more info, see the Knowledge Center:
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_wlmhealthvalue.html">Providing WLM health values for a Liberty server</a></li>
+</ul>
+
+</div>
+
+<div id="usagemeter" >
+<h2>Submit usage metrics from a Liberty server to IBM Cloud Private</h2>
+The new <code>usageMetering-1.0</code> feature adds the capability to register a Liberty server with an IBM Cloud Private metering service and submit usage metrics.
+
+IBM Cloud Private metering enhances the way IBM middleware products can be registered and tracked. It helps track product instances and report usage metrics. Using IBM Cloud Private metering, organizations will have the opportunity to extend and achieve the benefits of cloud environments. For example, IT administrators will be able to register all of their products in a single dashboard, simplifying the management tasks. And capacity planners will be able to right-size their environments based on usage data. In addition, enabling usage metering with IBM Cloud Private metering provides support for the new hourly pricing option for container deployments.
+
+For more info, see the WebSphere Liberty Knowledge Center docs on <a href="https://www-03preprod.ibm.com/support/knowledgecenter/SSAW57_liberty_temp/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_enabling_metering_service.html">enabling the metering service for Liberty applications</a>.
+
+</div>
+
+
+<div id="rfe">
+<h2>Request for enhancements (RFEs) completed in WebSphere Liberty 18.0.0.3</h2>
+
+In this release, the following RFEs were completed for WebSphere Liberty:
+
+<ul>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=117478">RFE 117478: Allow user id to resource access visibility as remote log target</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=119222">RFE 119222: Support various login configurations at once in WebSphere Liberty Profile</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=65111">RFE 65111: Enable Multiple Liberty Instances per Addresspace to attach angel demon</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=104798">RFE 104798: WLM Health API for Liberty</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=99189">RFE  99189: WLM/Transaction Class for MQ workload in Liberty</a></li>
+</ul>
+
+</div>
+
+<p class="ibm-btn-row pn-p40">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download Liberty 18.0.0.3"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download Liberty 18.0.0.3</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/09/OL_badge-1024x306.png" alt="Built on Open Liberty" width="640" height="191" class="alignleft size-large wp-image-23627" /></a>
+
+We'd love you to get involved in any way that you can, such as testing the code in ways that you use Liberty and raising issues <a href="https://github.com/openliberty/">on GitHub</a>, or create pull requests on the code and documentation. You can contribute to discussions about Open Liberty on the <a href="https://groups.io/g/openliberty">mailing list</a>.
+
+
+
+<p style="clear:left"></p>

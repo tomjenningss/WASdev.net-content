@@ -1,0 +1,81 @@
+Try out the single logout function with single sign-on, and HTTP sesssion persistence backed by JCache in the March 2018 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Check out the <a href="/wasdev/blog/2018/03/16/microprofile-1-3-liberty-18001/">18.0.0.1 release of WebSphere Liberty</a> which is built on the <a href="https://openliberty.io/news/2018/03/16/distributed-tracing-microservices-18001.html">18.0.0.1 release of Open Liberty</a>. Both were released today. Look out for more betas over the coming months. If you just can't wait, take a look at the <a href="https://openliberty.io/downloads/">daily builds of Open Liberty</a>.
+
+Follow Open Liberty happenings on <a href="https://twitter.com/openlibertyio">@OpenLibertyIO</a>.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#sso">Single logout with SAML Web single sign-on (SSO)</a></li>
+<li><a href="#sessioncache">HTTP session persistence backed by JCache</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<div id="sso" />
+
+<h2>Single logout with SAML Web single sign-on (SSO)</h2>
+
+Liberty as a SAML service provider is now equipped with the SAML single logout function which allows users to terminate all the login sessions established using SAML Web single sign-on (SSO). This single logout function can be initiated from either the service provider or the identity provider.
+
+Using SAML Web SSO, the user logs in to the identity provider once and receives unlimited access to different web applications without additional login prompts. It is not easy for the end user to be aware of all the opened web sessions and, as a result, they can end up with orphaned log-in sessions which might pose a security risk.
+
+This new SAML single logout (SLO) function enables near-simultaneous logout of an end user. It also allows the users to terminate all their login sessions with one click of a mouse button and can be initiated from service provider or identity provider.
+
+To enable the SSO feature in the <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>samlWeb-2.0</feature>
+</featureManager>
+[/code]
+
+To configure the Liberty service provider (SP) for SAML single logout:
+
+Liberty SingleLogoutService URL takes the format <code>https://&lt;hostname&gt;:&lt;sslport&gt;/ibm/saml20/&lt;SP configuration ID&gt;/slo</code>, and can be found from the Liberty SP's metadata (<code>https://&lt;hostname&gt;:&lt;sslport&gt;/ibm/saml20/&lt;SP configuration ID&gt;/samlmetadata</code>).
+
+For an identity provider-initiated (Idp) single logout, no additional configuration step is required. Liberty SP listens to the logout request on the SingleLogoutService URL, and automatically responds to the single logout request.
+
+To create a logout button for the SP to start an SP-initiated single logout, your logout button must redirect the web browser to the URL <code>https://&lt;host:sslport&gt;/ibm/saml20/&lt;&lt;SP configuration ID&gt;/logout</code>. When a user clicks the logout button, the Liberty SP automatically starts the single logout request and redirects the user to the post-logout page to indicate logout status after the logout has completed.  You can use the new <code>postLogoutRedirectUrl</code> SAML configuration attribute to specify a customized post logout landing page.
+
+<div id="sessioncache" />
+
+<h2>HTTP session persistence backed by JCache</h2>
+
+This feature provide a beta of the ability to have WebSphere Application Server Liberty persist HTTP sessions to a JCache (Java Caching) provider in place of a database.
+
+Enable the <code>sessionCache-1.0</code> feature in <code>server.xml</code> and configure the <code>httpSessionCache</code> configuration element to point at any JCache 1.1 spec compliant Java Caching provider.  The <code>httpSessionCache</code> element accepts a URI to provider specific configuration and has a nested <code>properties</code> element that accepts generic key/value pairs for properties that are supplied to the JCache provider:
+
+[code lang="xml"]
+<featureManager>
+   <feature>servlet-4.0</feature>
+   <feature>sessionCache-1.0</feature>
+</featureManager>
+ 
+<httpSessionCache libraryRef="HazelcastLib" uri="file:${shared.resource.dir}/hazelcast/hazelcast-client.xml">
+   <properties prop1="value1"/>
+</httpSessionCache>
+
+<library id="HazelcastLib">
+   <file name="/usr/lib/hazelcast.jar"/>
+</library>
+
+[/code]
+
+To find out more, see Andy Guibert's new blog post on <a href="https://openliberty.io/news/2018/03/22/distributed-in-memory-session-caching.html">adding distributed in-memory session caching to your Java apps</a> or check out the <a href="https://www.ibm.com/support/knowledgecenter/en/was_beta_liberty/com.ibm.websphere.liberty.autogen.beta.doc/ae/rwlp_feature_sessionCache-1.0.html">WebSphere Liberty Knowledge Center docs</a>.
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2018/02/16/microprofile-1-3-feb-liberty-beta/">February Liberty beta</a> included a preview of MicroProfile 1.3: MicroProfile Rest Client 1.0, MicroProfile Config 1.2, and MicroProfile OpenAPI 1.0
+
+MicroProfile 1.3 is now fully-supported in <a href="/wasdev/blog/2018/03/16/microprofile-1-3-liberty-18001/">WebSphere Liberty 18.0.0.1</a>, which was released today.
+
+<h2>Looking for the latest?</h2>
+
+If you're visiting this post from the future and you're looking for the latest releases of Liberty, here are the links you're looking for:
+
+<a href="https://developer.ibm.com/wasdev/docs/new-in-latest-earlyaccess">Latest beta release</a>
+<a href="https://developer.ibm.com/wasdev/docs/new-latest-ga-download">Latest stable release</a>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

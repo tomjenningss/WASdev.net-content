@@ -1,0 +1,30 @@
+At yesterday’s <a href="http://www.eclipse.org/microprofile">Eclipse MicroProfile</a> public hangout, we had two major announcements: First, that we have announced the content for the next major MicroProfile 1.1 release and, second, that we have a new MicroProfile logo.
+
+<h2>MicroProfile 1.1 content</h2>
+
+The original MicroProfile 1.0 release relied on existing Java EE specifications: CDI 1.2, JAX-RS 2.0, and JSON-P 1.0.  These three specifications were deemed to provide the absolute minimum programming model for microservices in the Enterprise Java space.  Since that original release, the <a href="http://microprofile.io">MicroProfile</a> community has been busy defining new specifications that go beyond Java EE.  Some of the areas being explored include Configuration, Fault Tolerance, Security (JWT) Propagation, Health Check, Health Metrics, Open Tracing, and Open API (Swagger) integration.
+
+The first MicroProfile component to reach the 1.0 release milestone was the Configuration API.  The basic premise of the Configuration specification is to separate the application’s configuration data from the application itself.  There should be no need to re-build or re-package an application just because the configuration has changed.  The application should be able to access or even modify the configuration while in an executing environment.
+
+Just last week, the MicroProfile Configuration component announced their 1.0 release--complete with the specification, API, TCK, and documentation.  Implementations that support this Configuration 1.0 definition should be coming shortly, with <a href="https://svn.apache.org/repos/asf/geronimo/components/config/trunk">Apache Geronimo Config</a> and <a href="/wasdev/blog/2017/08/04/beta-websphere-liberty-tools-august-2017/">WebSphere Liberty Beta</a> leading the way.
+
+As the MicroProfile community decided to focus on time-boxed deliveries (rather than content-based deliveries), the content for MicroProfile 1.1 was decided by what’s ready…  To that end, MicroProfile 1.1 consists of the following technologies:
+
+<ul>
+<li>Configuration API 1.0</li>
+<li>CDI 1.2</li>
+<li>JAX-RS 2.0</li>
+<li>JSON-P 1.0</li>
+</ul>
+
+<h2>New MicroProfile logo</h2>
+
+The other major announcement at yesterday's hangout was our new MicroProfile logo:
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/08/microprofile-logo.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/08/microprofile-logo.png" alt="" width="896" height="158" class="alignnone size-full wp-image-23450" /></a>
+
+Our original logo satisfied our initial needs.  But, as we continued to grow, we wanted to ensure that the logo grew with us.  We worked as a global team to narrow down the choices and then we decided to let the larger MicroProfile community choose the final design from four finalists (three new logos as well as the original logo).  This new logo just barely beat out the original logo, well ahead of the other two proposals.
+
+<h2>Get involved</h2>
+
+Finally, just a quick reminder that MicroProfile is an open community and we’re constantly looking for additional participation from vendors, user groups, and individuals.  The best way to get started is to take a look at our <a href="https://groups.google.com/forum/#!forum/microprofile">Google Groups</a>, or jump right into one of our <a href="https://microprofile.io/projects">component code repos</a>.  Welcome!

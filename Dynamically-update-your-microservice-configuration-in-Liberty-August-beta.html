@@ -1,0 +1,104 @@
+Easily and dynamically update your Java microservice configuration by adding or modifying variables in the Liberty server configuration. Try out MicroProfile Config 1.3 in the August 2018 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. We recently released <a href="/wasdev/blog/2018/06/29/java-ee-8-liberty-18-0-0-2/">WebSphere Liberty 18.0.0.2</a>, built on <a href="https://openliberty.io/blog/2018/06/29/full_java_ee_8_liberty_18002.html">Open Liberty 18.0.0.2</a>.
+
+Look out for more betas over the coming months. If you just can't wait, take a look at the <a href="https://openliberty.io/downloads/">daily builds of Open Liberty</a>.
+
+Follow Open Liberty happenings on <a href="https://twitter.com/openlibertyio">@OpenLibertyIO</a>.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#mpconfig">Dynamically update your microservice configuration with MicroProfile Config 1.3</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+
+<div id="mpconfig" >
+<h2>Dynamically update your microservice configuration with MicroProfile Config 1.3</h2>
+
+MicroProfile Config separates configuration from microservices so that applications can be configured differently when running in different environments. You can now easily and dynamically change your application's configuration by adding or modifying variables in the Liberty <code>server.xml</code> file.
+
+In addition, Liberty builds on previous versions of MicroProfile Config with enhancements in the areas of implicit converters and the mapping of config properties to environment variables. You can use this feature with either the <code>cdi-1.2</code> feature or the <code>cdi-2.0</code> feature.
+
+To enable the MicroProfile Config 1.3 feature, add it to the <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+  <feature>mpConfig-1.3</feature>
+</featureManager>
+[/code]
+
+<h4>Define configuration in the server.xml</h4>
+
+Define a MicroProfile application's configuration through the Liberty <code>server.xml</code> file. Use the variable element in the <code>server.xml</code> to assign a value to a configuration entity that can be accessed by any application running on the server:
+
+[code lang="xml"]
+<variable name="varServerXMLKey1" value="valueinVarServerXMLVariable1" />
+[/code]
+
+Alternatively, use the <code>appProperties</code> property element to assign a value to a configuration entity that can be accessed by a specific application:
+ 
+[code lang="xml"]
+    <application location="variableServerXMLApp.war">
+        <appProperties>
+             <property name="appServerXMLKey1" value="valueinAppProperties1"/>
+        </appProperties>
+    </application>
+[/code]
+
+<h4>Implicit converter improvements</h4>
+The implicit converters have been improved so that if no built-in nor custom Converter is available for a requested Type T, an implicit Converter is automatically provided in any of the following situations:
+
+<ul>
+<li>The target type <code>T</code> has a <code>public static T of(String)</code> method.</li>
+<li>The target type <code>T</code> has a <code>public static T valueOf(String)</code> method.</li>
+<li>The target type <code>T</code> has a public Constructor with a String parameter.</li>
+<li>The target type <code>T</code> has a <code>public static T parse(CharSequence)</code> method. This change means that some built-in converters were no longer required and have been removed.</li>
+</ul>
+
+See the GitHub issue: <a href="https://github.com/eclipse/microprofile-config/issues/325">#325</a>.
+
+<h4>Mapping a config property to environment variable</h4>
+Some operating systems allow only alphabetic characters or an underscore (<code>_</code>) in environment variables. Other characters such as period (<code>.</code>), forward slash (<code>/</code>), and so on may be disallowed. In order to set a value for a config property that has a name containing such disallowed characters from an environment variable, this <code>ConfigSource</code> searches 3 environment variables for a given property name (e.g. <code>com.ACME.size</code>) and the first environment variable found is returned:
+
+<ol>
+<li>Exact match (i.e. <code>com.ACME.size</code>)</li>
+<li>Replace the character that is neither alphanumeric nor an underscore with an underscore (<code>_</code>) (i.e. <code>com_ACME_size</code>)</li>
+<li>Replace the character that is neither alphanumeric nor an underscore with an underscore (<code>_</code>) and convert to upper case (i.e. <code>COM_ACME_SIZE</code>).</li>
+</ol>
+
+See the GitHub issue: <a href="https://github.com/eclipse/microprofile-config/issues/264">#264</a>.
+
+<h4>Other changes</h4>
+There were also some specification changes: <a href="https://github.com/eclipse/microprofile-config/issues/348">#348</a>, <a href="https://github.com/eclipse/microprofile-config/issues/325">#325</a>, <a href="https://github.com/eclipse/microprofile-config/issues/264">#264</a>.
+
+The API bundle can work with either CDI 1.2 or CDI 2.0 in an OSGi environment.
+
+
+<h4>Find out more</h4>
+
+For more info:
+
+<ul>
+<li><a href="https://github.com/eclipse/microprofile-config/milestone/3?closed=1">Full list of changes since MicroProfile Config 1.2</a></li>
+<li><a href="https://www.openliberty.io/guides/microprofile-config-intro.html">Separating configuration from code in microservices (Open Liberty interactive guide)</a></li>
+<li><a href="https://www.openliberty.io/guides/microprofile-config.html">Configuring microservices (Open Liberty guide)</a></li>
+<li><a href="What is MicroProfile Config?">https://www.eclipse.org/community/eclipse_newsletter/2017/september/article3.php (Eclipse newsletter)</a></li>
+<li><a href="http://microprofile.io/project/eclipse/microprofile-config">MicroProfile Config (MicroProfile.io)</a></li>
+</ul>
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2018/07/05/monitor-fault-tolerance/">July Liberty beta</a> included getting metrics about the fault tolerance of your Java microservices with MicroProfile Metrics integration with MicroProfile Fault Tolerance 1.1.
+
+<h2>Looking for the latest?</h2>
+
+If you're visiting this post from the future and you're looking for the latest releases of Liberty, here are the links you're looking for:
+
+<a href="https://developer.ibm.com/wasdev/docs/new-in-latest-earlyaccess">Latest beta release</a>
+<a href="https://developer.ibm.com/wasdev/docs/new-latest-ga-download">Latest stable release</a>
+<a href="https://www.openliberty.io/downloads/">Open Liberty downloads</a>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

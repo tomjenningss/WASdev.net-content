@@ -1,0 +1,342 @@
+WebSphere Liberty 17.0.0.3 is now available to download. It contains a full implementation of MicroProfile 1.2, improvements to the Liberty Maven and Gradle build tools, and more as well!
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/10/OL_logomark_132_wht.png" alt="" width="262" height="191" class="alignleft size-full wp-image-23746" /></a>Since our last release of WebSphere Liberty, as <a href="/wasdev/blog/2017/09/19/liberty-open-source/">you may have heard</a>, we've released the main parts of Liberty as the open source project <a href="https://github.com/OpenLiberty">Open Liberty</a>. WebSphere Liberty is built on Open Liberty, which means that a lot of the Liberty development is now done in the open on GitHub. You can find out more about Open Liberty on the <a href="https://openliberty.io/">Open Liberty website</a>.
+
+We'd love you to get involved in any way that you can, such as testing the code in ways that you use Liberty and raising issues <a href="https://github.com/openliberty/">on GitHub</a>, or create pull requests on the code and documentation. You can contribute to discussions about Open Liberty on the <a href="https://groups.io/g/openliberty">mailing list</a>.
+
+<p class="ibm-btn-row pn-p40" style="clear:left">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download WebSphere Liberty 17.0.0.3"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download WebSphere Liberty 17.0.0.3</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+What's new in WebSphere Liberty 17.0.0.3?
+
+<ul>
+<li>Request for enhancements (RFEs) <em>(Added 2018-01-18)</em></li>
+<li>MicroProfile 1.2 new features
+
+<ul>
+<li><a href="#mp-fault">MicroProfile Fault Tolerance</a></li>
+<li><a href="#mp-config">MicroProfile Config API</a></li>
+<li><a href="#mp-metrics">MicroProfile Metrics</a></li>
+<li><a href="#mp-health">MicroProfile Health</a></li>
+<li><a href="#mp-jwt">MicroProfile JSON Web Token</a></li>
+</ul></li>
+<li>Build tools updates
+
+<ul>
+<li><a href="#gradle">Liberty Gradle plugin</a></li>
+<li><a href="#maven">Maven enhancements in WebSphere Developer Tools</a></li>
+</ul></li>
+<li>Other runtime feature updates
+
+<ul>
+<li><a href="#openapi">OpenAPI</a></li>
+<li><a href="#transportsecurity">Transport security</a></li>
+<li><a href="#requesttiming">Request timing</a></li>
+<li><a href="#mongodb">Mongodb</a></li>
+</ul></li>
+</ul>
+
+<h2>Request for enhancements (RFEs)</h2>
+
+In this release, the following RFE was completed:
+
+<ul>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&amp;CR_ID=75545">184278: Request to support Dynamic Outbound SSL configuration in Liberty Profile</a></li>
+</ul>
+
+<h2>MicroProfile 1.2 new features</h2>
+
+With this release, we complete the WebSphere Liberty implementation of MicroProfile 1.2. Joining the previously released JAX-RS2.0, CDI 1.2, and JSON-P 1.0 features, we now add MicroProfile Fault Tolerance, Config API 1.1, Metrics, Health, and JSON Web Token features.
+
+To enable all the MicroProfile 1.2 features, add this definition to your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>microProfile-1.2</feature>
+</featureManager>
+[/code]
+
+Alternatively, you can add the individual features as described below.
+
+<div id="mp-fault" />
+
+<h3>MicroProfile Fault Tolerance</h3>
+
+The increasing size of applications, newer architectures that are as likely to 'scale out' as to 'scale up', and the rising popularity of microservice architectures, it is increasingly important to build fault tolerance into our system architecture.
+
+Fault tolerance can be improved using a number of well tested approaches that handle failure:
+
+<ul>
+<li><strong>TimeOut</strong>: Limit the amount of time we are prepared to wait for a result</li>
+<li><strong>RetryPolicy</strong>: Control how much we are prepared to re-submit a request</li>
+<li><strong>Fallback</strong>: Specify what should we do when the primary service cannot be used successfully</li>
+<li><strong>Bulkhead</strong>: If calls to a service are slow (perhaps it is overloaded or we are timing out), specify what proportion of our local resources we are prepared to get involved in the traffic jam</li>
+<li><strong>CircuitBreaker</strong>: When a service is proving unreliable, for example timing out, we can choose to 'fail fast'  by automatically failing calls to it under control</li>
+</ul>
+
+With the Microprofile Fault Tolerance specification, we can control all these aspects with easy-to-use Java annotations at a method or class level that is independent of any particular vendor or implementation library.
+
+To add just the Fault Tolerance feature, update your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>mpFaultTolerance-1.0</feature>
+</featureManager>
+[/code]
+
+Then take a look at <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_microprofile_fault_tolerance.html">these code snippets in the Knowledge Center</a> to get started.
+
+Find out more about the <a href="https://github.com/eclipse/microprofile-fault-tolerance">Fault Tolerance feature in GitHub</a>.
+
+<div id="mp-config" />
+
+<h3>MicroProfile Config API 1.1</h3>
+
+The MicroProfile Configuration specification provides a single way to view and access multiple sources of configuration, such as properties files and environment variables, including bootstrap.properties, user-level properties files, registered Java classes that implement the ConfigSource API, and the Java System properties.
+
+When your applications are deployed as microservices, having a single place to update the configuration data of multiple microservices is useful for several reasons. Building systems as collections of independent microservices increases the number of services that need to be managed. Different stages in the pipeline often use different configuration sources for a single piece of configuration data and a given component needs updating as it moves through the pipeline. Containerisation of services means that even while a component is ‘live’ in production, the environment it is running in might be more dynamic and the components need configuration updates without being restarted.
+
+The Config API allows for a consistent means to access configuration data from pluggable configuration sources. Configuration properties can be injected using Java CDI in a form that is easy to consume. Data values and sources can vary across the devOps pipeline without code change or repackaging, and dynamic and fully typed data is catered for.
+
+To add just the Config API feature, update your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>mpConfig-1.1</feature>
+</featureManager>
+[/code]
+
+Find out more about the <a href="https://github.com/eclipse/microprofile-config">Config API feature in GitHub</a>.
+
+<div id="mp-metrics" />
+
+<h3>MicroProfile Metrics</h3>
+
+MicroProfile Metrics provides a way for developers to instrument their microservices and applications that will be portable across all MicroProfile Metrics implementations.  The API is similar to the Dropwizard Metrics API that many developers are already familiar with. Using MicroProfile Metrics avoids the need to find and include third-party metrics libraries and integrate those libraries with Liberty.
+
+For operations teams, MicroProfile Metrics provides a consistent way to access metrics from their Liberty servers through a simple REST interface.  The REST API can return output compatible with Prometheus or with any monitoring tools that can consume JSON.
+
+<strong>Developers</strong>: The <code>microProfile-1.2</code> feature can be used to enable all MicroProfile features.  If you want only the <code>mpMetrics-1.0</code> feature, here’s what you want in your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+    <feature>mpMetrics-1.0</feature>
+</featureManager>
+[/code]
+
+To find out more, see the Knowledge Center: <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_mp_metrics_add.html">Adding metrics to applications</a>
+
+<strong>Ops</strong>: To enable the <code>/metrics</code> REST interface, add the following definition to your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+    <feature>mpMetrics-1.0</feature>
+</featureManager>
+<quickStartSecurity userName="theUser" userPassword="thePassword"/>
+<keyStore id="defaultKeyStore" password="Liberty"/>
+[/code]
+Then verify that things are set up correctly by hitting <code>https://yourserver:9443/metrics</code>
+
+To find out more, see the Knowledge Center: <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_mp_metrics_monitor.html">Monitoring the Liberty server runtime environment</a>
+
+Find out more about the <a href="https://github.com/eclipse/microprofile-metrics">Metrics feature in GitHub</a>.
+
+<div id="mp-health" />
+
+<h3>MicroProfile Health feature</h3>
+
+MicroProfile Health defines an API for providing health check procedures in a microservice and a runtime environment for invoking installed health checks and aggregating an overall response.
+
+MicroProfile Health specifies a standard health check API that works across any runtime supporting MicroProfile 1.2.  The feature provides a default response even when the installed microservice does not implement any health checks.  It provides a standard health check URL, allowing for a consistent way to configure service monitors (e.g., Kubernetes liveness checks).
+
+Add the <code>mpHealth-1.0</code> feature to the server configuration and add zero or more health checks to the microservice.  A <code>/health</code> context is provided by the server for invoking the health checks.
+
+To add just the Health feature, update your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>mpHealth-1.0</feature>
+</featureManager>
+[/code]
+
+For more details, see the <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_microprofile_healthcheck.html">documentation in the Knowledge Center</a>.
+
+Find out more about the <a href="https://github.com/eclipse/microprofile-health">Health feature in GitHub</a>.
+
+<div id="mp-jwt" />
+
+<h3>MicroProfile JSON Web Token</h3>
+
+With the MicroProfile JSON Web Token feature, an application developer can write a JAX-RS application to programmatically authorize resource access using CDI injection or the standard JAX-RS container API in an interoperable way.
+
+An administrator can configure Liberty to perform authentication and authorization based on incoming JWT without requiring a user registry.
+
+To add just the MicroProfile JSON Web Token feature, update your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>mpJwt-1.0</feature>
+</featureManager>
+[/code]
+
+For more details, see the <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_sec_json.html">documentation in the Knowledge Center</a>
+
+Find out more about the <a href="https://github.com/MicroProfileJWT/microprofile-jwt-auth">MicroProfile JSON Web Token feature in GitHub</a>.
+
+<h2>Liberty build tools updates</h2>
+
+<div id="gradle" />
+
+<h3>Liberty Gradle plugin</h3>
+
+The Liberty Gradle plugin has many improvements to help you install and manage your Liberty server. These tasks can be used to test your web application on a Liberty server more easily and for packaging your servers.  The plugin update includes enhancements to the following tasks:
+
+<ul>
+<li><code>installLiberty</code> task:
+
+<ul>
+<li>Add support to install using Maven repository coordinates</li>
+<li>Provide Liberty license upgrade </li>
+</ul></li>
+<li><code>installFeature</code> task:
+
+<ul>
+<li>Support installing from a local folder</li>
+</ul></li>
+<li><code>libertyStart</code> task:
+
+<ul>
+<li>Add timeout test support</li>
+<li>Add application start verification</li>
+</ul></li>
+<li>new <code>installApps</code> task:
+
+<ul>
+<li>Improved application installation</li>
+<li>Support multiple WAR file tasks for installation</li>
+<li>Loose application support to make debugging faster</li>
+</ul></li>
+<li><code>libertyCreate</code> task:
+
+<ul>
+<li>Server configuration creation</li>
+<li>Copy <code>server.xml</code></li>
+<li>Copy <code>server.env</code>, <code>bootstrap.properties</code>, <code>jvm.options</code> files</li>
+<li>Create <code>bootstrap.properties</code> and <code>jvm.options</code> from inline configuration  </li>
+<li>Copy a folder of configuration</li>
+</ul></li>
+<li><code>libertyRun</code> task fixes</li>
+<li>new <code>compileJSP</code> task</li>
+</ul>
+
+In addition there are:
+
+<ul>
+<li>Documentation improvements</li>
+<li>Enhancements to the Liberty Gradle lifecycle with task dependencies</li>
+</ul>
+
+The open source Liberty Gradle plugin is used with the Gradle WAR plugin to install project WAR files and loose applications to a Liberty Server. For more details, see <a href="https://github.com/WASdev/ci.gradle/blob/master/README.md">the Liberty Gradle plugin documentation</a> in GitHub.
+
+<div id="maven" />
+
+<h3>Liberty Maven enhancements in WebSphere Developer Tools</h3>
+
+The WebSphere Developer Tools (WDT) and the Liberty Maven plugin added integrated support for enterprise applications built using the Liberty Maven plugin. The plugin can now build your whole enterprise application as a loose application for easier debugging in the WDT environment. No more rebuilding your Maven EAR project for every application update. The integration between WDT and Maven projects allow the servers created by the Liberty Maven plugin to be managed by WDT. This support is an extension to the Maven web application support previously added.
+
+When importing EAR projects using the Liberty Maven plugin, WDT recognizes the project as containing Liberty servers it can manage.
+
+For more about WebSphere Developer Tools for Eclipse, see the <a href="https://www.ibm.com/support/knowledgecenter/en/SSHR6W/com.ibm.websphere.wdt.doc/topics/welcome_wdt.htm">Knowledge Center</a> and <a href="https://www.ibm.com/support/knowledgecenter/en/SSHR6W/com.ibm.websphere.wdt.doc/topics/tmaven_intro.htm">Developing Maven projects</a>.
+
+Find out more about the open source Liberty Maven plugin in the <a href="https://github.com/WASdev/ci.maven/blob/master/README.md">Liberty Maven plugin on GitHub</a>.
+
+<h2>Other runtime updates</h2>
+
+<div id="openapi" />
+
+<h2>OpenAPI</h2>
+
+OpenAPI v3 is the official specification for modelling RESTful APIs.  The new openapi-3.0 feature exposes annotations and programming interfaces to facilitate the auto-generation of OpenAPI v3 documents from Java applications.  These APIs are a result of the collaboration between SmartBear and IBM in the Swagger open source repositories (https://github.com/swagger-api/swagger-core) , and thus are exposed as 3rd party APIs in Liberty.
+
+To enable the OpenAPI feature, update your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>openapi-3.0</feature>
+</featureManager>
+[/code]
+
+For more details, see the <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_api_openapi.html">Knowledge Center</a>
+
+<div id="transportsecurity" />
+
+<h2>Transport Security</h2>
+
+The Transport Security feature provides dynamic SSL filters. This enables administrators to configure SSL configuration to be used for outbound connections based on the host (or host and port) of the destination.  You can configure the SSL configuration without having to use direct references in individual components.
+
+To enable an outbound SSL filter in the <code>server.xml</code>, add an element called <code>&lt;outboundConnection /&gt;</code>.  The <code>&lt;outboundConnection /&gt;</code> element is nested in the <code>&lt;ssl /&gt;</code> element.   The <code>&lt;outboundConnection /&gt;</code> element contains two attributes: <code>host</code> and <code>port</code>. The <code>host</code> attribute is required; the <code>port</code> attribute is optional.  A missing <code>port</code> attribute means any port on the configured host. When configured, and an outbound SSL connection is made, the connection can be matched to an SSL configuration that is assigned to the destination host, or host and port, that is specified in the <code>&lt;outboundConnection /&gt;</code> element.
+
+In the following example, the outbound SSL connection going to a machine called <code>testMachine</code> and port <code>9443</code> uses an SSL context created with information from the <code>&lt;ssl /&gt;</code> element called <code>customSSLSettings</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>transportSecurity-1.0</feature>
+</featureManager>
+
+<ssl id="customSSLSettings" keyStoreRef="customKeyStore" trustStoreRef="customTrustStore"
+    sslProtocol="TLSv1.2" clientAuthenticationSupported="true" >
+   <outboundConnection host="testHostMachine" port="9443"/>
+</ssl>
+[/code]
+
+For more details, see the <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_config_ssl_outbound_filter.html">Knowledge Center documentation</a>
+
+<div id="requesttiming" />
+
+<h2>Request Timing</h2>
+
+Request timing thresholds can now be set at a per-application or per-servlet level.  This means that the one or two oddball servlets you have that don't fit the model of the rest of the application can now have their thresholds set separately. This means you can monitor the rest of your application more closely for timing-related problems.
+
+To configure fine-grained request timing, use the <code>&lt;servletTiming/&gt;</code> and <code>&lt;jdbcTiming/&gt;</code> child elements of the <code>&lt;requestTiming/&gt;</code> configuration in <code>server.xml</code>.
+
+[code lang="xml"]
+<featureManager>
+    <feature>requestTiming-1.0</feature>
+</featureManager>
+   <!-- Defaults for all timed requests -->
+<requestTiming slowRequestThreshold="5s" hungRequestThreshold="10s">
+   <!-- Specific thresholds for this application -->
+   <servletTiming appName="jdbcTestPrj_4"
+     slowRequestThreshold="90s"
+     hungRequestThreshold="120s"/>
+   <!-- Specific thresholds for this specific servlet (in any app) -->
+   <servletTiming servletName="MyServlet"
+     slowRequestThreshold="30s"
+     hungRequestThreshold="60s"/>
+   <!-- Specific timings for this specific servlet in this specific app -->
+   <servletTiming appName="jdbcTestPrj_3" servletName="MyOtherServlet"
+     slowRequestThreshold="120s"
+     hungRequestThreshold="180s"/>
+   <!-- Specific threshold for all JDBC requests -->
+   <jdbcTiming slowRequestThreshold="2m" hungRequestThreshold="5m"/>
+</requestTiming> 
+[/code]
+
+More details can be found in the <a href="https://www.ibm.com/support/knowledgecenter/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_requesttiming.html">Knowledge Center documentation</a>
+
+<div id="mongodb" />
+
+<h2>MongoDB integration</h2>
+
+This release updates the <code>mongodb-2.0</code> feature. It adds SSL communication between Liberty and MongoDB and supports both SSL encryption and certificate authentication over SSL.
+
+For more details, see <a href="https://docs.mongodb.com/manual/tutorial/configure-ssl/">Configure mongod and mongos for TLS/SSL</a> and <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_mongodb_secure.html">Configuring secure MongoDB connections in Liberty</a>.
+
+<p class="ibm-btn-row pn-p40">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download Liberty 17.0.0.3"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download Liberty 17.0.0.3</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/09/OL_badge-1024x306.png" alt="Built on Open Liberty" width="640" height="191" class="alignleft size-large wp-image-23627" /></a>
+
+<p style="clear:left"></p>

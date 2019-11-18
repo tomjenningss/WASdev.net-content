@@ -1,0 +1,196 @@
+Try out the Java 8 updates in JPA 2.2 and Java EE 8 updates in JSF 2.3, plus a minor update to OpenAPI 3.0, in the October 2017 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2017/10/17/microprofile-1-2-liberty-17-0-0-3/">last week</a>. Look out for more betas over the coming months.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#limits">Some limitations in this beta</a></li>
+<li><a href="#jpa22">Java Persistence API 2.2 (JPA 2.2)</a></li>
+<li><a href="#jsf23">JavaServer Faces 2.3 (JSF 2.3)</a></li>
+<li><a href="#openapi3">OpenAPI 3.0</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<div id="limits" />
+
+<h2>Some limitations in this beta</h2>
+
+<code>/me blushes</code> So, we were hoping to have fixed these but, well, we got caught up in the excitement of <a href="https://openliberty.io/news/2017/09/19/open-sourcing-liberty.html">Open Liberty</a>, <a href="https://openliberty.io/news/2017/09/29/javaone-sessions-open-liberty-team.html">JavaOne</a>, the <a href="/wasdev/blog/2017/10/17/microprofile-1-2-liberty-17-0-0-3/">Liberty 17.0.0.3 release</a>, too much sugar... The upshot is that we didn't <strong>actually</strong> get them fixed in time for this beta. So I still have to explain...
+
+<code>*deep breath*</code>
+
+The beta enables the <code>microProfile-1.2</code> feature by default (this includes JAX-RS2.0, CDI 1.2, JSON-P 1.0, <code>mpConfig-1.1</code>, <code>mpFaultTolerance-1.0</code>, <code>mpHealth-1.0</code>, <code>mpJwt-1.0</code>, and <code>mpMetrics-1.0</code>). The new Java EE 8 features available in this beta (see the <a href="/wasdev/blog/2017/09/29/microprofile-metrics-sept-2017-beta/">September beta</a>) are currently not compatible with the <code>microProfile-1.2</code> feature.
+
+This means that to try any of the Java EE 8 features in this beta, you must add the relevant definition to the <code>server.xml</code> (see below for details) and you must remove the microProfile-1.2 definition from the <code>server.xml</code> to disable it.
+
+Also note that the <code>jaxrs-2.1</code> feature doesn’t currently work with <code>servlet-4.0</code> (see the <a href="/wasdev/blog/2017/09/29/microprofile-metrics-sept-2017-beta/">September beta</a>). What can I say? It’s a beta and there are limitations. It will get better. 🙂 Promise.
+
+<div id="jpa22" />
+
+<h2>Java Persistence API 2.2 (JPA 2.2)</h2>
+
+Updated to support new features introduced in Java 8, including the new Java Date and Time API, Query Result Collection streaming, repeatable JPA annotations.
+
+Java 8 introduced a new Date and Time API, which is more powerful than the old APIs part of <code>java.util</code> for years.  Collection streaming, introduced in Java 8, is now formally supported by the JPA 2.2 specification, enabling new ways to process query result sets.  Many JPA annotations are now repeatable, eliminating the need to use grouping annotations.
+
+Simply add <code>&lt;feature&gt;jpa-2.2&lt;/feature&gt;</code> to the <code>server.xml</code>'s <code>&lt;featureManager&gt;</code> list to enable the JPA 2.2 spec level and the Eclipselink 2.7 JPA persistence provider bundled with the feature.  If you wish to use your own Eclipselink 2.7 binaries, you can instead enable the <code>&lt;feature&gt;jpaContainer-2.2&lt;/feature&gt;</code> feature which provides JPA 2.2 container integration but does not enable the provided Eclipselink JPA provider implementation.
+
+<h3>Examples of JPA 2.2 Enhancements:</h3>
+
+@Repeatable Annotations (before JPA 2.2):
+
+[code lang="java"]
+@PersistenceContexts(
+  @PersistenceContext(name=“foo”, unitName=“bar”),
+  @PersistenceContext(name=“cloud”, unitName=“sky”))
+@Stateless
+public class SomeEJB {
+…
+[/code]
+
+@Repeatable Annotations (with JPA 2.2):
+
+[code lang="java"]
+@PersistenceContext(name=“foo”, unitName=“bar”),
+@PersistenceContext(name=“cloud”, unitName=“sky”)
+@Stateless
+public class SomeEJB {
+…
+
+[/code]
+
+JPA 2.2 supports java.time types:
+
+[code lang="java"]
+@Entity
+public class MyEntity {
+…
+  // The following map to database time column types natively now
+  @Basic private java.time.LocalDate localDate;
+  @Basic private java.time.LocalDateTime localDateTime;
+  @Basic private java.time.LocalTime localTime;
+  @Basic private java.time.OffsetTime offsetTime;
+  @Basic private java.time.OffsetDateTime offsetDateTime;
+…
+}
+[/code]
+
+Attribute Converter classes now support CDI bean injection:
+
+[code lang="java"]
+@Converter
+public class B2IConverter implements AttributeConverter<Boolean, Integer> {
+    final static Integer FALSE = new Integer(0);
+    final static Integer TRUE = new Integer(1);
+
+    @Inject
+    private MyLogger logger;
+
+    @Override
+    public Integer convertToDatabaseColumn(Boolean b) {
+        Integer i = b ? TRUE : FALSE;
+        logger.log("Convert: " + b + " -> " + i);
+        return i;
+    }
+
+    @Override
+    public Boolean convertToEntityAttribute(Integer i) {
+        Boolean b = TRUE.equals(s) ? Boolean.TRUE : Boolean.FALSE;
+        logger.log("Convert: " + i + " -> " + b);
+        return b;
+    }
+}
+[/code]
+
+Method Stream <code>getResultStream()</code> added to Query and TypedQuery interfaces:
+
+[code lang="java"]
+@Stateless public class SBean {
+   @PersistenceContext(unitName=“Personnel”) EntityManager em;
+
+   public int getEmployeeSalaryBudget(int deptId) {
+      final AtomicInteger salBudget = 0;
+
+      TypedQuery<Employee> q = em.createQuery(”SELECT e FROM Employee e WHERE e.deptId = :deptId”, Employee.class);
+      q.setParameter(“deptId”, deptId);
+
+      Stream<Employee> empStream = q.getResultStream();
+      empStream.forEach( t -> salBudget.set(salBudget.get() + t.getSalary()));
+
+      return salBudget.get();
+   }
+}
+[/code]
+
+For more information, see:
+
+<ul>
+<li><a href="https://javaee.groups.io/g/jpa-spec/">JPA Specification Group</a></li>
+<li><a href="https://github.com/javaee/jpa-spec/blob/master/jsr338-MR/JavaPersistence.pdf">JPA 2.2 Specification</a></li>
+<li><a href="https://javadoc.io/doc/org.eclipse.persistence/javax.persistence/2.2.0-RC1">Java 2.2 JavaDoc</a></li>
+<li><a href="https://www.eclipse.org/eclipselink/">Eclipselink</a></li>
+</ul>
+
+<div id="jsf23" />
+
+<h2>JavaServer Faces 2.3 (JSF 2.3)</h2>
+
+JavaServer Faces 2.3 (JSF 2.3) is the latest version of the JSF specification. JSF 2.3 contains many new features and enhancements.
+
+Take advantage of the latest JSF features and enhancements. The jsf-2.3 feature pulls in the Apache MyFaces implementation and integrates it into the Liberty runtime. The following features of JSF 2.3 have been tested and are available for use:
+
+<ul>
+<li><code>&lt;f:importConstants/&gt;</code></li>
+<li>Enhanced component search facility</li>
+<li>DataModel implementions can be registered</li>
+<li>CDI replacement for <code>@ManagedProperty</code></li>
+<li>UIData and <code>&lt;ui:repeat&gt;</code>support for Map and Iterable</li>
+<li><code>&lt;ui:repeat&gt;</code> condition check</li>
+<li>Java Time Support</li>
+<li>WebSocket Integration via <code>&lt;f:websocket&gt;</code></li>
+<li>Multi-field  Validation via <code>&lt;f:validateWholeBean&gt;</code></li>
+<li>Use CDI for evaluation of JSF specific EL implicit Objects</li>
+<li>Support <code>@Inject</code> on JSF specific artifacts</li>
+</ul>
+
+To enable the JSF 2.3 feature just add the following feature definition to your <code>server.xml</code>:
+
+[code lang="xml"]
+    <featureManager>
+        <feature>jsf-2.3</feature>
+    </featureManager>
+[/code]
+
+If you wish to use CDI you currently must enable  the <code>cdi-1.2</code> feature along with the <code>jsf-2.3</code> feature in your <code>server.xml</code>. When a Java EE 8 CDI feature is available you will have to use the Java EE 8 version instead of the Java EE 7 version.
+
+For more information, see:
+* <a href="https://myfaces.apache.org/">Apache MyFaces</a>
+* <a href="https://jcp.org/en/jsr/detail?id=372">JavaServerFaces 2.3 Specification</a>
+
+<div id="openapi3" />
+
+<h2>OpenAPI 3.0</h2>
+
+You can now customize the URLs for public endpoints in the <code>openapi-3.0</code> feature.
+
+By default, two endpoints are available for a server:
+
+<pre><code>`GET http://host:http_port/api/docs`
+`GET http://host:http_port/api/explorer`
+</code></pre>
+
+You can change the URL of the public endpoints with the <code>publicURL</code> attribute in the <code>server.xml</code>. For example, setting the following configuration in the <code>server.xml</code> makes the public REST API documentation available with <code>GET http://host:http_port/myAPI/docs</code> and <code>http://host:http_port/myAPI/explorer</code>:
+
+[code lang="xml"]
+<openapi publicURL="myAPI" />
+[/code]
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2017/09/29/microprofile-metrics-sept-2017-beta/">September Liberty beta</a> included previews of some of our Java EE 8 features, including Servlet 4.0, JAX-RS 2.1, and JSF 2.3, plus HTTP/2.0 and distributed tracing.
+
+This is our first beta release since the <a href="/wasdev/blog/2017/10/17/microprofile-1-2-liberty-17-0-0-3/">17.0.0.3</a> release in October 2017.
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

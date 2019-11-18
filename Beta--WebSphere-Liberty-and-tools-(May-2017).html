@@ -1,0 +1,62 @@
+Here's the latest WebSphere Liberty beta and WebSphere Developer Tools (WDT).
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2017/03/14/new-release-websphere-liberty-17-0-0-1/">in March</a>.
+
+Look out for more betas over the coming months.
+
+<p class="ibm-btn-row pn-p40">
+<a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a>
+</p>
+
+<h2>What’s in the WebSphere Liberty beta for May?</h2>
+
+<h3>Social Login feature</h3>
+
+Social login is a form of web single sign-on using that uses existing user information in one social medium such as Facebook, Twitter, Google, Github, and or Linkedin to sign a user into a website instead of creating a new login account specifically for that website. WebSphere Liberty server offers social login functionality by adding the <code>socialLogin-1.0</code> feature, and allows users to select a social media account to sign in to a web site hosted on a Liberty server. Login with a social media account is a fast and convenient way for users to log into your application or website hosted on a Liberty server.
+
+<h3>Transport Security feature update</h3>
+
+Outbound SSL filtering support has been added. For outbound SSL connections you will now have the ability to configure a SSL configuration to use the base on the host or the host and the port the outbound call is going to.
+
+<h3>API Discovery feature update</h3>
+
+This feature updates the Swagger libraries that are part of the <code>apiDiscovery-1.0</code> Liberty feature to their most recently released open source levels.
+
+The Swagger libraries, UI and code generation tool have been updated to their latest levels to match the current development experience with open source. This includes fixes and enhancements up to <code>Swagger-core v1.5.12</code>.
+
+<h3>Enhancement to the Java Batch Tool on the Admin Center</h3>
+
+You can now restart a job instance with updated parameters. The confirmation dialog that is displayed allows you to add, remove, and alter job parameters for a restart request.
+
+<h3>MicroProfile Config feature</h3>
+
+With the <code>mpConfig-1.0</code> feature, you can directly use the Config APIs to retrieve configuration without the need to know where the properties are defined. The properties can be dynamically updated and then retrieved by the applications without the application restarting. The configuration can be located in multiple sources, and has a priority system. If the same property is specified in multiple config sources, the value from the config source with the highest priority will be used. The properties can be overwritten by users in different environments.
+
+<h3>MicroProfile Fault Tolerance feature</h3>
+
+With the <code>mpFaultTolerance-1.0</code> feature, you can make the service invocation resilient via retry, fallback, timeout, circuit breaker and bulkhead functionalities. If a service invocation fails, a retry can be performed. After some retries, a fallback operation can be specified. Indefinite waiting is no longer a problem as the timeout can be specified on service invocation. Repeating timeouts are solved by the functionality of the circuit breaker. You will not need to package fault tolerance libraries into your applications any more.
+
+<h2>What’s already in there?</h2>
+
+The April Liberty beta included the Validator feature and Logstash Collector and Bluemix Log Collector updates.
+
+Take a look at the previous beta announcements for a full list of stuff added since the <a href="/wasdev/blog/2016/06/24/websphere-liberty-and-tools-16-0-0-2-release/">16.0.0.2</a> release in June 2016:
+
+<ul>
+<li><a href="/wasdev/blog/2017/04/13/beta-websphere-liberty-tools-april-2017/">April 2017 beta</a></li>
+<li><a href="/wasdev/blog/2017/03/14/beta-websphere-liberty-tools-march-2017/">March 2017 beta</a></li>
+<li><a href="/wasdev/blog/2017/02/17/beta-websphere-liberty-tools-february-2017/">February 2017 beta</a></li>
+<li><a href="/wasdev/blog//2017/01/20/beta-websphere-liberty-tools-january-2017/">January 2017 beta</a></li>
+<li><a href="/wasdev/blog/2016/12/16/beta-websphere-liberty-and-tools-december-2016/">December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/11/18/beta-websphere-liberty-and-tools-novemberdecember-2016/">November/December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/10/21/beta-websphere-liberty-and-tools-november-2016/">November 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/09/23/beta-websphere-liberty-and-tools-october-2016/">October 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/08/26/beta-websphere-liberty-and-tools-september-2016/">September 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/07/28/beta-websphere-liberty-and-tools-august-2016/">August 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/30/beta-websphere-liberty-and-tools-july-2016/">July 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/03/beta-websphere-liberty-and-tools-june-2016/">June 2016 beta</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40">
+<a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a>
+</p>

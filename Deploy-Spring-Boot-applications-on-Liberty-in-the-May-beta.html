@@ -1,0 +1,178 @@
+Deploy Spring Boot applications on Liberty (without packaging them as a WAR) with the May 2018 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>. Also, bring your own JSF 2.3 implementation, custom X.509 certificate mapping updates, and customize the URL path of your OpenAPI docs.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Check out the <a href="/wasdev/blog/2018/03/16/microprofile-1-3-liberty-18001/">18.0.0.1 release of WebSphere Liberty</a> which is built on the <a href="https://openliberty.io/news/2018/03/16/distributed-tracing-microservices-18001.html">18.0.0.1 release of Open Liberty</a>. Look out for more betas over the coming months. If you just can't wait, take a look at the <a href="https://openliberty.io/downloads/">daily builds of Open Liberty</a>.
+
+Follow Open Liberty happenings on <a href="https://twitter.com/openlibertyio">@OpenLibertyIO</a>.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#springboot">Deploy Spring Boot applications to Liberty</a></li>
+<li><a href="#jsfcontainer">Bring your own JSF 2.3 implementation with JSF Container</a></li>
+<!--
+<li><a href="#security">Support for custom X.509 certificate mapping in Liberty's LDAP and basic user registries</a></li>
+-->
+<li><a href="#openapi">Customize the URL path of OpenAPI docs</a></li>
+<li><a href="#jandex">Speed up application start-up with Jandex indexes</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+
+<div id="springboot" >
+<h2>Deploy Spring Boot applications on Liberty</h2>
+
+Liberty has added support for Spring Boot applications that use Spring Boot version 1.5.x and Spring Boot version 2.0.x.  With this feature Spring Boot applications can be deployed to Liberty without the need to package them as a WAR.  Additionally Liberty has added tools to manage library dependencies of Spring Boot applications which allow for creating more efficient use of Docker layers for a Spring Boot application's content.
+
+<img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2018/05/LibertySpringBootSupport-e1526040201773.jpg" alt="" width="658" height="313" class="aligncenter size-full wp-image-24518" />
+
+For help, see the WebSphere Liberty Knowledge Center:
+
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_springboot.html">Spring Boot programming model support</a></li>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_dep_springboot.html">Deploying a Spring Boot application to Liberty</a></li>
+</ul>
+
+</div>
+
+<div id="jsfcontainer" >
+<h2>Bring your own JSF 2.3 implementation with JSF Container</h2>
+
+Bring your own JSF 2.3 implementation (either Mojarra or MyFaces) to Liberty and take advantage of CDI integrations provided by the <code>cdi-2.0</code> feature.
+
+To bring your own JSF 2.3 implementation, package your own JSF implementation inside of your application and add the JSF Container feature to the <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>jsfContainer-2.3</feature>
+</featureManager>
+[/code]
+
+And off you go!
+
+For help, see the <a href="https://www.ibm.com/support/knowledgecenter/en/was_beta/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_jsf23_implementations.html">WebSphere Liberty beta Knowledge Center</a>.
+
+</div>
+
+<!--
+<div id="security" >
+<h2>Support for custom X.509 certificate mapping in Liberty's LDAP and basic user registries</h2>
+
+You now have complete control over how certificates are mapped to users in the user registry. 
+
+The out-of-the-box X.509 certificate mappers for the LDAP user registry did not handle custom OID's, parsing of certificate fields and included custom filtering of only a subset of the certificate's fields. For example, there was no support for Subject Alternative Name (SAN). The out-of-the-box X.509 certificate mapper for the basic user registry only supported using the subject's <code>cn</code> RDN for the user name. With the X509CertificateMapper API, you can now map a X.509  certificate to a user in the user registry in any way that is required.
+
+<h3>Enabling the custom mapping using the BELLs feature</h3>
+
+Implement the <code>com.ibm.websphere.security.X509CertificateMapper</code> interface and include it in a JAR. Also include in the JAR a Java ServiceLoader provider configuration file (<code>META-INF/com.ibm.websphere.security.X509CertificateMapper</code>) that contains the fully-qualified class names of any X509CertificateMapper implementations to be used in the Liberty server. Each implementation must be preceded by a comment line containing a key-value pair containing the key <code>x509.certificate.mapper.id</code> and a unique ID as the value. Use this ID to reference the implementation from the <code>server.xml</code> configuration file. Load these implementations into Liberty's classpath using the <code>bells-1.0</code> feature and a shared library. 
+
+Example configuration file entry:
+
+[code]
+           # x509.certificate.mapper.id=basicMapper
+           com.mycompany.BasicMapper
+           # x509.certificate.mapper.id=ldapMapper
+           com.mycompany.LdapMapper
+[/code]
+
+Example <code>server.xml</code> configuration for two separate X509CertificateMapper implementations to a basic and LDAP user registry:
+
+[code lang="xml"]
+          <server>
+              <featureManager>
+                  <feature>basicRegistry-1.0</feature>
+                  <feature>ldapRegistry-3.0</feature>
+                  <feature>bells-1.0</feature>
+              </featureManager>
+
+              <!--
+                      The library contains any X509CertificateMapper implementations.
+               -->
+              <library id="mylibrary">
+                  <file name="${shared.resource.dir}/libs/myLibrary.jar" />
+              </library>
+
+              <!--
+                      Bundle the library using the BELLS feature.
+               -->
+              <bell libraryRef="mylibrary" />
+
+              <!--
+                      Reference the X509CertificateMapper(s) from the user registries by configuring the
+                      certificateMapMode attribute to "CUSTOM" and referencing the ID configured in the
+                      provider configuration file in the certificateMapperId attribute.
+               -->
+              <basicRegistry ... certificateMapMode="CUSTOM" certificateMapperId="basicMapper" />
+              <ldapRegistry ... certificateMapMode="CUSTOM" certificateMapperId="ldapMapper" />
+          </server>
+[/code]
+
+<h3>Enabling the custom mapping with a user feature</h3>
+
+Implement the <code>com.ibm.websphere.security.X509CertificateMapper</code> interface and include it in the user feature bundle. Define the X509CertificateMapper implementations as Service Components. The Service Component must specify the <code>x509.certificate.mapper.id</code> property which defines a unique ID as the value. The property can either be specified manually in the Service Component XML file or using the property field of the Component annotation. Load these implementations into Liberty's classpath with the user feature. Use this ID to reference the implementation from the <code>server.xml</code> configuration file.
+
+Example <code>server.xml</code> configuration for configuring two separate X509CertificateMapper implementations to a basic and LDAP user registry:
+
+[code lang="xml"]
+          <server>
+              <featureManager>
+                  <feature>basicRegistry-1.0</feature>
+                  <feature>ldapRegistry-3.0</feature>
+                  <feature>usr:myFeature-1.0</feature>
+              </featureManager>
+
+              <!--
+                      Reference the X509CertificateMapper(s) from the user registries by configuring the
+                      certificateMapMode attribute to "CUSTOM" and referencing the ID configured in the
+                      Service Component in the certificateMapperId attribute.
+               -->
+              <basicRegistry ... certificateMapMode="CUSTOM" certificateMapperId="basicMapper" />
+              <ldapRegistry ... certificateMapMode="CUSTOM" certificateMapperId="ldapMapper" />
+          </server>
+[/code]
+
+
+For more info, see the WebSphere Liberty Knowledge Center docs on <a href="https://www.ibm.com/support/knowledgecenter/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_sec_basic_certmap.html">Basic registry mapping</a> and <a href="https://www.ibm.com/support/knowledgecenter/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_sec_ldap_certmap.html">LDAP registry mapping</a>.
+
+</div>
+-->
+<div id="openapi">
+<h2>Customize the URL path of OpenAPI docs</h2>
+
+The <code>openapi-3.1</code> feature (introduced in the <a href="/wasdev/blog/2018/04/13/document-restful-apis-openapi-beta/">April beta</a>) supports the <a href="https://github.com/eclipse/microprofile-open-api">MicroProfile OpenAPI 1.0 specification</a> and provides an aggregated view of APIs from multiple applications deployed in the server.
+
+New in the May Beta: You can now customize the URL path of the public endpoints by using MicroProfile Configuration. For example, setting the <code>mp.openapi.extensions.liberty.public.url</code> property to <code>/my/custom</code> changes the location of the aggregated document endpoint from <code>/api/docs</code> to <code>/my/custom/docs</code>. Similarly, the location of the rendered user interface would change from <code>/api/explorer</code> to <code>/my/custom/explorer</code>. You can now designate APIs as private by setting the <code>mp.openapi.extensions.liberty.public</code> property to false at the application level. This setting hides APIs from the public endpoint view. Setting the <code>mp.openapi.extensions.liberty.enable.private.url</code> property to true makes private APIs available at the following private endpoints: <code>/ibm/api/docs</code> (aggregated document) and <code>/ibm/api/explorer</code> (UI).
+
+</div>
+
+<div id="jandex">
+<h2>Speed up application start-up with Jandex indexes</h2>
+
+If your application has many classes and is enabled for processing annotations, <a href="https://github.com/wildfly/jandex">Jandex indexes</a> considerably speed up the start-up of the application.
+
+To enable Jandex indexes, add Jandex indexes to the application archives (standard location is the <code>META-INF/jandex.idx</code> path) and configure the <code>server.xml</code>:
+
+[code lang="xml"]
+<applicationManager autoExpand="true" useJandex="true"/>
+<application name="TestApp" location="TestApp.war" type="war" useJandex="true"/>
+[/code]
+
+To create Jandex indexes for your app, see <a href="http://javahowto.blogspot.co.uk/2012/08/how-to-run-jboss-jandex.html">How to run JBoss Jandex</a>.
+
+Find out more in the <a href="https://www.ibm.com/support/knowledgecenter/en/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_improve_app_start.html">WebSphere Liberty Knowledge Center</a>.
+</div>
+
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2018/04/13/document-restful-apis-openapi-beta/">April Liberty beta</a> included OpenAPI 3.1 for documenting your RESTful APIs, single sign-on with JWT, and custom X.509 certificate mapping to users.
+
+<h2>Looking for the latest?</h2>
+
+If you're visiting this post from the future and you're looking for the latest releases of Liberty, here are the links you're looking for:
+
+<a href="https://developer.ibm.com/wasdev/docs/new-in-latest-earlyaccess">Latest beta release</a>
+<a href="https://developer.ibm.com/wasdev/docs/new-latest-ga-download">Latest stable release</a>
+<a href="https://www.openliberty.io/downloads/">Open Liberty downloads</a>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

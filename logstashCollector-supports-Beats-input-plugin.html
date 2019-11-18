@@ -1,0 +1,10 @@
+Logstash is phasing out the Lumberjack input plugin and no longer includes it in its default bundle starting in version 6.0. They now recommend you use the <a href="https://www.elastic.co/guide/en/logstash-versioned-plugins/current/input-beats-index.html">Beats</a> input plugin.
+
+If you are using the <code>logstashCollector-1.0</code> or <code>logstashCollector-1.1</code> features in WebSphere Liberty, you can switch the input plugin from Lumberjack to Beats in the Logstash configuration file. The <code>logstashCollector-1.0</code> and <code>logstashCollector-1.1</code> features work with both Lumberjack and Beats input plugins.  No special configuration is required for logstashCollector in <code>server.xml</code>.
+
+The sample Logstash configuration files provided in Github have been updated:
+
+<ul>
+<li><a href="https://github.com/WASdev/sample.logstash.collector/tree/master/version-1.0/Kibana5/17.0.0.1%2B/20170516">logstashCollector-1.0 sample configuration file</a></li>
+<li><a href="https://github.com/WASdev/sample.logstash.collector/tree/master/version-1.1/Kibana5/Beta/20170516">logstashCollector-1.1 sample configuration file</a></li>
+</ul> 

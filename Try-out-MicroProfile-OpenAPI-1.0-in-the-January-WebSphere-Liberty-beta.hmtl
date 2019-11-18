@@ -1,0 +1,59 @@
+Try out our latest beta capabilities, MicroProfile OpenAPI 1.0 and JSON format logging, in the January 2018 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Check out the <a href="/wasdev/blog/2017/12/21/liberty-gradle-plugin-17-0-0-4/">17.0.0.4 release of WebSphere Liberty</a> which is built on the <a href="https://openliberty.io/news/2017/12/21/jsf-implementation-open-liberty-17004.html">17.0.0.4 release of Open Liberty</a>. Look out for more betas over the coming months. If you just can't wait, take a look at the <a href="https://openliberty.io/downloads/">daily builds of Open Liberty</a>.
+
+Follow Open Liberty happenings on <a href="https://twitter.com/openlibertyio">@OpenLibertyIO</a>.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#mpopenapi">MicroProfile OpenAPI 1.0</a></li>
+<li><a href="#jsonlog">JSON format logging</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<div id="mpopenapi" />
+
+<h3>MicroProfile OpenAPI 1.0</h3>
+
+The MicroProfile OpenAPI 1.0 feature (<code>mpOpenAPI-1.0</code>) is a preview implementation of the <a href="https://github.com/eclipse/microprofile-open-api">MicroProfile OpenAPI 1.0 specification</a>.  To try it out, add this feature to your <code>server.xml</code> list of features:
+
+[code lang="xml"]
+<featureManager>
+    <feature>mpOpenAPI-1.0</feature>
+</featureManager>
+[/code]
+
+Then use one of <a href="https://github.com/eclipse/microprofile-open-api/blob/master/spec/src/main/asciidoc/microprofile-openapi-spec.adoc#documentation-mechanisms">the documentation methods</a>. You can view the generated OpenAPI document in the endpoint <code>/openapi</code>, or view the rendered user interface at the endpoint <code>api/explorer</code>.
+
+<div id="jsonlog" />
+
+<h3>JSON format logging</h3>
+
+Currently, message events in <code>console.log</code> and <code>messages.log</code> are written in a simple, human-friendly text format.  FFDC, trace, and access log events are written into their separate output files.  With the new JSON logging enhancement, message, trace, FFDC, and access log events can be configured to write to <code>messages.log</code> and/or <code>console.log</code> in JSON format. This means they can be read and parsed seamlessly by common open source logging stacks running in containerized environments.
+
+Enable JSON logging by setting environment variables, bootstrap properties, or specifying new attributes in the <code>&lt;logging&gt;</code> element in <code>server.xml</code>. For example:
+
+[code lang="xml"]
+<logging traceSpecification="com.myco.mypackage.*=finest" messageFormat="json" messageSource="message,trace,accessLog,ffdc"/>
+[/code]
+
+This enables JSON logging, and message, trace, access log, and FFDC events are written to <code>messages.log</code>.
+
+For more information, see the <a href="https://www.ibm.com/support/knowledgecenter/en/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_logging.html">Knowledge Center docs</a>.
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2017/12/21/security-api-1-0-december-beta/">December Liberty beta</a> included Security API 1.0, Gradle integration with WebSphere Developer Tools, endpoint control with MBeans, and JPA 2.2 updates.
+
+For supported features, take a look at <a href="/wasdev/blog/2017/12/21/liberty-gradle-plugin-17-0-0-4/">17.0.0.4</a> also released in December.
+
+<h2>Looking for the latest?</h2>
+
+If you're visiting this post from the future and you're looking for the latest releases of Liberty, here are the links you're looking for:
+
+<a href="https://developer.ibm.com/wasdev/docs/new-in-latest-earlyaccess">Latest beta release</a>
+<a href="https://developer.ibm.com/wasdev/docs/new-latest-ga-download">Latest stable release</a>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

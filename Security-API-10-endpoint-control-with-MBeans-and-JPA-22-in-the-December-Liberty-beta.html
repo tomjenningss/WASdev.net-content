@@ -1,0 +1,172 @@
+Try out our latest beta capabilities: Security API 1.0, Liberty Gradle plugin integration in Eclipse, endpoint control with MBeans, and  JPA 2.2! It's all in this December 2017 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Check out the <a href="/wasdev/blog/2017/12/21/liberty-gradle-plugin-17-0-0-4/">17.0.0.4 release of WebSphere Liberty</a> which is built on the <a href="https://openliberty.io/news/2017/12/21/jsf-implementation-open-liberty-17004.html">17.0.0.4 release of Open Liberty</a>. Look out for more betas over the coming months. If you just can't wait, take a look at the <a href="https://openliberty.io/downloads/">daily builds of Open Liberty</a>.
+
+Follow Open Liberty happenings on <a href="https://twitter.com/openlibertyio">@OpenLibertyIO</a>.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#appsecurity">Security API 1.0</a></li>
+<li><a href="#gradle">Gradle integration with WebSphere Developer Tools</a></li>
+<li><a href="#endpointcontrol">Endpoint control with MBeans</a></li>
+<li><a href="#jpa22">Java Persistence API 2.2 (JPA 2.2)</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<div id="appsecurity" />
+
+<h3>Security API 1.0</h3>
+
+The <code>appSecurity-3.0</code> feature provides support for the Java EE Security API 1.0 specification. The <a href="https://jcp.org/en/jsr/detail?id=375">Java Specification Request (JSR) 375</a> specifies the requirement.
+
+The specification promotes self-contained application security portability across all Java EE servers, and makes use of modern programming concepts such as expression language and context dependency injection (CDI). It defines annotations specific to various authentication mechanisms, identity stores to handle user authentication, and common programming API to do programmatic Java EE security. It reduces the dependency on the deployment descriptors and application server based configuration for securing Java EE web resources.
+
+Once you configure the <code>appSecurity-3.0</code> feature, your application can annotate the authentication mechanisms and the identity stores that will use the application server provided implementations. You can also provide your own implementations to replace the application server provided ones. The applications can also use the SecurityContext API to perform programmatic security checks. You can find an example <code>server.xml</code> configuration in <a href="https://www.ibm.com/support/knowledgecenter/was_beta/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_sec_jee_api.html">the Knowledge Center docs</a>.
+
+<div id="gradle" />
+
+<h2>Gradle integration with WebSphere Developer Tools (WDT)</h2>
+
+Import web application Gradle projects into WDT for developing in Eclipse.  You can now take advantage of WDT features from your Gradle projects, including running applications directly from the workspace, incremental publishing, and using the server configuration editor while maintaining the Gradle structure of your project.
+
+For fully integrated Gradle development of web applications within WDT:
+
+<ol>
+<li>Set up your Gradle project to use the Liberty Gradle plugin (see <a href="https://github.com/WASdev/ci.gradle">the Liberty Gradle plugin docs</a>, or have a look at one of the samples: <a href="https://github.com/WASdev/sample.servlet">Servlet sample</a>, <a href="https://github.com/WASdev/sample.jpa">JPA sample</a>, <a href="https://github.com/WASdev/sample.javaee7.jta">JTA sample</a>).</li>
+<li>Import your project as an existing Gradle project into WDT: <strong>File > Import > Gradle > Existing Gradle Project</strong></li>
+<li>When prompted to create a server, click <strong>Yes</strong>:
+<img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/12/createServer.png" alt="" width="686" height="264" class="aligncenter size-full wp-image-2409" /></li>
+<li>Start working on your application.</li>
+</ol>
+
+When you make changes to your application or server configuration WDT automatically runs the Gradle tasks needed to publish your changes.
+
+Find out more in <a href="https://www.ibm.com/support/knowledgecenter/en/SSHR6W/com.ibm.websphere.wdt.doc/topics/gradledev.htm">the Knowledge Center documentation</a>.
+
+The open source Liberty Gradle plugin is used with the Gradle WAR plugin to install project WAR files and loose applications to a Liberty Server. For more details, see <a href="https://github.com/WASdev/ci.gradle/blob/master/README.md">the Liberty Gradle plugin documentation</a> in GitHub.
+
+<div id="endpointcontrol" />
+
+<h2>Endpoint control with MBeans</h2>
+
+Prior to this feature, the only option for administrators wanting to stop inbound http traffic to the server was to use the server pause/resume commands (added in version 17.0.0.1) from the command line; for more info, see <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_PauseResume_cmd.html">the Knowledge Center docs</a>.
+
+The endpoint control feature provides Liberty administrators with a new MBean that provides the same function as the command line counterparts, but may be more useful in a operations context because it can be invoked via JMX.  Like the command line functions, the MBean is currently limited to controlling HTTP endpoints but, because it is a generic mechanism for controlling server endpoints (like messaging and IIOP), it gives us the flexibility to add other endpoint types.  Keep watching the Liberty betas for new endpoint types being added.
+
+The beta MBean has the Object name: <code>WebSphere:feature=kernel,name=ServerEndpointControl</code> and, like most mbeans, is self-describing. If you don't know what any of that means, take a look at this blog post on <a href="/wasdev/blog/2017/12/21/mbean-controls-server-endpoints/">controlling server endpoint traffic with MBeans</a>.
+
+<div id="jpa22" />
+
+<h2>Java Persistence API 2.2 (JPA 2.2)</h2>
+
+Updated to support new features introduced in Java 8, including the new Java Date and Time API, Query Result Collection streaming, repeatable JPA annotations.
+
+Java 8 introduced a new Date and Time API, which is more powerful than the old APIs part of <code>java.util</code> for years.  Collection streaming, introduced in Java 8, is now formally supported by the JPA 2.2 specification, enabling new ways to process query result sets.  Many JPA annotations are now repeatable, eliminating the need to use grouping annotations.
+
+Simply add <code>&lt;feature&gt;jpa-2.2&lt;/feature&gt;</code> to the <code>server.xml</code>'s <code>&lt;featureManager&gt;</code> list to enable the JPA 2.2 spec level and the Eclipselink 2.7 JPA persistence provider bundled with the feature.  If you wish to use your own Eclipselink 2.7 binaries, you can instead enable the <code>&lt;feature&gt;jpaContainer-2.2&lt;/feature&gt;</code> feature which provides JPA 2.2 container integration but does not enable the provided Eclipselink JPA provider implementation.
+
+<h3>Examples of JPA 2.2 Enhancements:</h3>
+
+@Repeatable Annotations (before JPA 2.2):
+
+[code lang="java"]
+@PersistenceContexts(
+  @PersistenceContext(name=“foo”, unitName=“bar”),
+  @PersistenceContext(name=“cloud”, unitName=“sky”))
+@Stateless
+public class SomeEJB {
+…
+[/code]
+
+@Repeatable Annotations (with JPA 2.2):
+
+[code lang="java"]
+@PersistenceContext(name=“foo”, unitName=“bar”),
+@PersistenceContext(name=“cloud”, unitName=“sky”)
+@Stateless
+public class SomeEJB {
+…
+
+[/code]
+
+JPA 2.2 supports java.time types:
+
+[code lang="java"]
+@Entity
+public class MyEntity {
+…
+  // The following map to database time column types natively now
+  @Basic private java.time.LocalDate localDate;
+  @Basic private java.time.LocalDateTime localDateTime;
+  @Basic private java.time.LocalTime localTime;
+  @Basic private java.time.OffsetTime offsetTime;
+  @Basic private java.time.OffsetDateTime offsetDateTime;
+…
+}
+[/code]
+
+Attribute Converter classes now support CDI bean injection:
+
+[code lang="java"]
+@Converter
+public class B2IConverter implements AttributeConverter<Boolean, Integer> {
+    final static Integer FALSE = new Integer(0);
+    final static Integer TRUE = new Integer(1);
+
+    @Inject
+    private MyLogger logger;
+
+    @Override
+    public Integer convertToDatabaseColumn(Boolean b) {
+        Integer i = b ? TRUE : FALSE;
+        logger.log("Convert: " + b + " -> " + i);
+        return i;
+    }
+
+    @Override
+    public Boolean convertToEntityAttribute(Integer i) {
+        Boolean b = TRUE.equals(s) ? Boolean.TRUE : Boolean.FALSE;
+        logger.log("Convert: " + i + " -> " + b);
+        return b;
+    }
+}
+[/code]
+
+Method Stream <code>getResultStream()</code> added to Query and TypedQuery interfaces:
+
+[code lang="java"]
+@Stateless public class SBean {
+   @PersistenceContext(unitName=“Personnel”) EntityManager em;
+
+   public int getEmployeeSalaryBudget(int deptId) {
+      final AtomicInteger salBudget = 0;
+
+      TypedQuery<Employee> q = em.createQuery(”SELECT e FROM Employee e WHERE e.deptId = :deptId”, Employee.class);
+      q.setParameter(“deptId”, deptId);
+
+      Stream<Employee> empStream = q.getResultStream();
+      empStream.forEach( t -> salBudget.set(salBudget.get() + t.getSalary()));
+
+      return salBudget.get();
+   }
+}
+[/code]
+
+For more information, see:
+
+<ul>
+<li><a href="https://javaee.groups.io/g/jpa-spec/">JPA Specification Group</a></li>
+<li><a href="https://github.com/javaee/jpa-spec/blob/master/jsr338-MR/JavaPersistence.pdf">JPA 2.2 Specification</a></li>
+<li><a href="https://javadoc.io/doc/org.eclipse.persistence/javax.persistence/2.2.0-RC1">Java 2.2 JavaDoc</a></li>
+<li><a href="https://www.eclipse.org/eclipselink/">Eclipselink</a></li>
+</ul>
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2017/11/24/java-ee-8-implementation-november-liberty-beta/">November Liberty beta</a> included previews of some of our Java EE 8 features, including Servlet 4.0, CDI 2.0, Application Security, JPA 2.2, and JSF 2.3.
+
+For supported features, take a look at <a href="/wasdev/blog/2017/12/21/liberty-gradle-plugin-17-0-0-4/">17.0.0.4</a> also released today.
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

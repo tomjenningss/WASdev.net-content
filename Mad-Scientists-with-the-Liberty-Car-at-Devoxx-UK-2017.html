@@ -1,0 +1,37 @@
+If you came to <a href="http://www.devoxx.co.uk/">Devoxx UK</a> last week, quite close to the door, you'll have come across us (<a href="/wasdev/blog/author/billy-dawson3/">Billy</a> and <a href="/wasdev/blog/author/laurac/">me</a>) dressed in white lab coats, talking about the <a href="/wasdev/docs/build-liberty-car-part-1-hardware/">Liberty Car</a>, and giving away some beautiful new t-shirts to celebrate <a href="/wasdev/blog/2015/06/29/growing-up-with-the-little-application-server-that-could/">Liberty turning 5 years old</a>:
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/05/DSC00963_edited.jpg"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/05/DSC00963_edited.jpg" alt="" width="640" height="480" class="aligncenter size-large wp-image-22356 photo" /></a>
+
+Aside from perpetuating the myth that scientists all wear white lab coats all the time (we don't) and are a bit eccentric (well, maybe), the Mad Scientists stand was a cool area of the exhibition hall where a bunch of IBMers showed off the funky projects we've worked on as part of our day-jobs or just for fun (or both). Many of the demos included at least one Raspberry Pi but they were all quite varied.
+
+For example, there was the Pi-powered LED t-shirt:
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/05/DSC00966_edited.jpg"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/05/DSC00966_edited.jpg" alt="" width="640" height="480" class="aligncenter size-large wp-image-22358 photo" /></a>
+
+And the Pi that went to the edge of space (yes, <a href="http://www.businessinsider.com/ibm-edge-of-space-project-2016-4">actual space</a>):
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/05/DSC00952_edited.jpg"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/05/DSC00952_edited.jpg" alt="" width="640" height="480" class="aligncenter size-large wp-image-22353 photo" /></a>
+
+There was the augmented reality demo (no Pi there):
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/05/DSC00972_edited.jpg"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/05/DSC00972_edited.jpg" alt="" width="640" height="480" class="aligncenter size-large wp-image-22359 photo" /></a>
+
+So, the Liberty Car. While the Liberty Car has been around for almost as long as Liberty itself, it's undergone some changes in the past year. It was originally conceived to show how small and fast <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a> is. Java application servers are usually thought of as quite large beasts. Yet the Liberty Car demo shows how you can write an app (in this case, to control a toy car from your phone), stick it on a Liberty server with only the bits of Java EE that the app needs to run, and it's perfectly happy on the constrained hardware resources of a Raspberry Pi 2 Model B.
+
+Recently, the Liberty Car has been upgraded to talk to the cloud (in this case, <a href="http://bluemix.net/">IBM Bluemix</a>) to demonstrate hybrid cloud setups. Now, instead of connecting your phone directly to the wifi on the car, you instead just visit a webpage hosted on Bluemix and drive the car from there. That webpage talks to the car via a secure gateway (think VPN) and you drive the car by tilting your phone this way and that.
+
+If you were there, thank you for coming to talk to us despite our demo failing to cope with the multitude of WIFI access points around us. This is what you would've seen (thanks to <a href="/wasdev/blog/author/jcolema3/">Jamie Coleman</a> for the quick video when we got back to the office):
+
+<center>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/e7Z_HugC33U" frameborder="0" allowfullscreen></iframe>
+
+</center>
+
+If you want to create your own Liberty Car, you can find the <a href="/wasdev/docs/build-liberty-car-part-2-software/">original instructions here on WASdev.net</a> and <a href="https://github.com/WASdev/skunkworks.libertycar">code in GitHub</a>. If you'd like to try the hybrid cloud version that we took to Devoxx UK, the code for that (still in development) is in <a href="https://github.com/WASdev/skunkworks.libertycar/tree/ms">a branch of the GitHub repository</a> but you'll also need a bit of extra setup. We'll hopefully bring you complete code and better instructions sometime soon (in the meantime, the original version should work just fine).
+
+We had a great couple of days - we talked to many people and gave away so many t-shirts - thank you for coming to see us if you were there. And thanks Martijn for your lovely words:
+
+<blockquote class="twitter-tweet" data-partner="tweetdeck"><p lang="en" dir="ltr">At <a href="https://twitter.com/hashtag/devoxxuk?src=hash">#devoxxuk</a> out of the exhibitors <a href="https://twitter.com/IBM">@ibm</a> has absolutely knocked it out of the park with AI &amp; IoT demos and engineers as booth staff  <a href="https://twitter.com/hashtag/ibmcode?src=hash">#ibmcode</a></p>&mdash; Martijn Verburg (@karianna) <a href="https://twitter.com/karianna/status/863037060206276608">May 12, 2017</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>

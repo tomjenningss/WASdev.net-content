@@ -1,0 +1,69 @@
+Try out the MicroProfile Configuration API and Fault Tolerance features for building Java microservices in the August/September 2017 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2017/06/13/new-release-websphere-liberty-17-0-0-2/">in June</a>. Look out for more betas over the coming months.
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<h2>MicroProfile Configuration API feature</h2>
+
+The MicroProfile Configuration specification provides a single way to view and access multiple sources of configuration, such as properties files and environment variables, including <code>bootstrap.properties</code>, user-level properties files, registered Java classes that implement the ConfigSource API, and the Java <code>System.properties</code>.
+
+When your applications are deployed as microservices, having a single place to update the configuration data of multiple microservices is useful for several reasons. Building systems as collections of independent microservices increases the number of services that need to be managed. Different stages in the pipeline often use different configuration sources for a single piece of configuration data and a given component needs updating as it moves through the pipeline. Containerisation of services means that even while a component is 'live' in production, the environment it is running in might be more dynamic and the components need configuration updates without being restarted.
+
+The <a href="https://projects.eclipse.org/proposals/eclipse-microprofile">Eclipse MicroProfile</a> initiative exists for 'Optimizing Enterprise Java for a microservices architecture' and, after the initial base platform of existing services was defined, the Microprofile Configuration API was <a href="https://groups.google.com/forum/#!msg/microprofile/l8a8a-sVGag/7HlXsbMLBgAJ">the first new API released by the MicroProfile community</a>. The API allows for a consistent means to access configuration data from pluggable configuration sources. Configuration properties can be injected using Java CDI in a form that is easy to consume. Data values and sources can vary across the devOps pipeline without code change or repackaging, and dynamic and fully typed data is catered for.
+
+<h3>Enabling the MicroProfile Configuration API feature</h3>
+
+Just update your <code>server.xml</code>:
+
+[code language="xml"]
+<featureManager>
+    <feature>mpConfig-1.0</feature>
+</featureManager>
+[/code]
+
+For more information, see the <a href="https://www.ibm.com/support/knowledgecenter/en/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_microprofile_appconfig.html">Knowledge Center</a>.
+
+<h2>MicroProfile Fault Tolerance</h2>
+
+The increasing size of 'web-scale' applications, newer architectures that are as likely to 'scale out' as to 'scale up', and the rising popularity of microservice architectures all contribute to the growing number of services that can be involved in a single business application. When combined with a utility model for service provision it is increasingly important to build fault tolerance into our system architecture.
+
+Fault tolerance can be improved using a number of well tested approaches that handle failure:
+
+<ul>
+<li><strong>TimeOut</strong>: Limit the amount of time we are prepared to wait for a result</li>
+<li><strong>RetryPolicy</strong>: Control how much we are prepared to re-submit a request</li>
+<li><strong>Fallback</strong>: Specify what should we do when the primary service cannot be used successfully</li>
+<li><strong>Bulkhead</strong>: If calls to a service are slow (perhaps it is overloaded or we are timing out), specify what proportion of our local resources we are prepared to get involved in the traffic jam</li>
+<li><strong>CircuitBreaker</strong>: When a service is proving unreliable, for example timing out, we can choose to 'fail fast'  by automatically failing calls to it under control</li>
+</ul>
+
+With the Microprofile Fault Tolerance specification, we can control all these aspects with easy-to-use Java annotations at a method or class level that is independent of any particular vendor or implementation library.
+
+<h3>Enabling the MicroProfile Fault Tolerance feature</h3>
+
+Just update your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>mpFaultTolerance-1.0</feature>
+</featureManager>
+[/code]
+
+Then take a look at <a href="https://www.ibm.com/support/knowledgecenter/en/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_microprofile_fault_tolerance.html">these code snippets in the Knowledge Center</a> to get started.
+
+<h2>What’s already in there?</h2>
+
+The August Liberty beta included the OpenAPI v3 feature, plus updates to the MicroProfile Config and Fault Tolerance features.
+
+Take a look at the previous beta announcements for a full list of stuff added since the <a href="/wasdev/blog/2017/06/13/new-release-websphere-liberty-17-0-0-2/">17.0.0.2</a> release in June 2017:
+
+<ul>
+<li><a href="/wasdev/blog/2017/08/04/beta-websphere-liberty-tools-august-2017/">August 2017 beta</a></li>
+<li><a href="/wasdev/blog/2017/07/07/beta-websphere-liberty-tools-july-2017/">July 2017 beta</a></li>
+<li><a href="/wasdev/blog/2017/06/13/beta-websphere-liberty-tools-june-2017/">June 2017 beta</a></li>
+</ul>
+
+<a href="/wasdev/docs/new-in-latest-earlyaccess">Show me what's in the most recent beta!</a>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

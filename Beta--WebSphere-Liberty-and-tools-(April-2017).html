@@ -1,0 +1,58 @@
+Here's the latest WebSphere Liberty beta and WebSphere Developer Tools (WDT).
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2017/03/14/new-release-websphere-liberty-17-0-0-1/">in March</a>.
+
+Look out for more betas over the coming months.
+
+<p class="ibm-btn-row pn-p40">
+<a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a>
+</p>
+
+<h2>What’s in the WebSphere Liberty beta for April?</h2>
+
+<h3>Validator feature</h3>
+
+The <code>validator-1.0</code> feature allows you to test your data source configuration without having any applications installed or updated to use the data source.  You can provide resource reference information for the test operation which allows the data source to be tested in the same way that your application uses it, allowing you to debug database configuration related issues without involving your application.
+
+<h3>Logstash Collector and Bluemix Log Collector updates</h3>
+
+The maximum length of the message field in <code>liberty_message</code>, <code>liberty_trace</code> and the <code>stackTrace</code> field of <code>liberty_ffdc</code> was previously fixed to 2048 characters. Some messages may have included a long Java stack trace and would have been truncated after 2048 characters.
+
+You can now customize the maximum length by setting the new attribute <code>maxFieldLength</code> in the <code>logstashCollector</code> and <code>bluemixLogCollector</code> element.  The default value is 2048.  Specify "-1" if you do not want to limit the length of the <code>message</code> and <code>stackTrace</code> field.
+
+<h3>Enhancements to the Java Batch Tool in the Admin Center</h3>
+
+<ul>
+<li>You can now purge a job instance. This will remove all database entries and job logs associated with the job instance.  An option to purge only the job store will be made available.</p></li>
+<li><p>Additional search criteria will be made available for narrowing the list of job instances displayed on the Java Batch Tool dashboard.  These include search by Last Update range, Submitter, Application Name, and Job Name.</p></li>
+</ul>
+
+<h3>WebSphere Developer Tools updates</h3>
+
+<p>Projects with a location outside your Eclipse workspace can now be deployed to a Liberty Docker server when running applications directly from the workspace.
+
+This means that you can use the running applications directly from the workspace mode with a Liberty Docker server even when your projects are imported from a local git repository.  If you deploy one of these projects to the server it will automatically create a new container with the volumes needed to access that project and other projects in the same directory locally.
+
+<h2>What’s already in there?</h2>
+
+The March 2017 beta included the MicroProfile Config feature and the MicroProfile Fault Tolerance feature.
+
+Take a look at the previous beta announcements for a full list of stuff added since the <a href="/wasdev/blog/2016/06/24/websphere-liberty-and-tools-16-0-0-2-release/">16.0.0.2</a> release in June 2016:
+
+<ul>
+<li><a href="/wasdev/blog/2017/03/14/beta-websphere-liberty-tools-march-2017/">March 2017 beta</a></li>
+<li><a href="/wasdev/blog/2017/02/17/beta-websphere-liberty-tools-february-2017/">February 2017 beta</a></li>
+<li><a href="/wasdev/blog//2017/01/20/beta-websphere-liberty-tools-january-2017/">January 2017 beta</a></li>
+<li><a href="/wasdev/blog/2016/12/16/beta-websphere-liberty-and-tools-december-2016/">December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/11/18/beta-websphere-liberty-and-tools-novemberdecember-2016/">November/December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/10/21/beta-websphere-liberty-and-tools-november-2016/">November 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/09/23/beta-websphere-liberty-and-tools-october-2016/">October 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/08/26/beta-websphere-liberty-and-tools-september-2016/">September 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/07/28/beta-websphere-liberty-and-tools-august-2016/">August 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/30/beta-websphere-liberty-and-tools-july-2016/">July 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/03/beta-websphere-liberty-and-tools-june-2016/">June 2016 beta</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40">
+<a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a>
+</p>

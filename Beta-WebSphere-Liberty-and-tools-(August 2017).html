@@ -1,0 +1,246 @@
+Here's the latest WebSphere Liberty beta and WebSphere Developer Tools (WDT). Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2017/06/13/new-release-websphere-liberty-17-0-0-2/">in June</a>. Look out for more betas over the coming months.
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+What's new in this release?
+
+<ul>
+<li><a href="#openapi">OpenAPI v3</a></li>
+<li><a href="#microprofile">MicroProfile</a></li>
+</ul>
+
+The OpenAPI feature and the MicroProfile Fault Tolerance and Configuration API features have all been updated since the last beta release of Liberty. The OpenAPI feature also has updated support in the WebSphere Developer Tools beta.
+
+<a name="openapi"></a>
+
+<h2>OpenAPI v3</h2>
+
+The OpenAPI v3 updates include additions to the Liberty OpenAPI feature and changes in WebSphere Developer Tools to support the OpenAPI feature.
+
+<h3>Liberty Runtime updates</h3>
+
+This is a new feature (introduced in the <a href="https://developer.ibm.com/wasdev/blog/2017/06/13/beta-websphere-liberty-tools-june-2017/">June beta</a>) to implement the official OpenAPI 3.0 specification, which is <a href="https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md">now final</a>.
+
+New additions to the August Beta include:
+
+<ul><li><strong>A new OpenAPI User Interface!</strong> Similar to <code>apiDiscovery-1.0</code>, the public UI for <code>openapi-3.0</code> is available at <code>/api/explorer</code>, and if the private endpoint is enabled (<code>&lt;openapi enablePrivateURL="true /&gt;</code>), you can reach the private UI at <code>/ibm/api/explorer</code>. This UI builds upon the <a href="https://github.com/swagger-api/swagger-ui">Swagger UI</a> through our collaboration with the open source community. Check out the UI by using our <a href="https://github.com/microservices-api/airlines-v3-oas">sample OpenAPI v3 application</a> today! (Note that there are some limitations with the UI at the moment; for example, it's not currently possible to edit the request body when trying out a particular operation.)
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/08/screenshot-2.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/08/screenshot-2.png" alt="" width="800" class="alignnone size-full wp-image-23379 screenshot" /></a></li>
+
+<li><strong>New validation support.</strong> Each OpenAPI v3 document provided by the application is validated against the validation constraints declared in the OpenAPI v3 specification. If an OpenAPI document processed by the <code>openapi-3.0</code> feature is invalid, an error is reported in the logs for each constraint that has been violated. In this Beta, a subset of the OpenAPI v3 specification was chosen, therefore Callback, Encoding, Link and Schema objects are not yet being validated.</li>
+
+<li><strong>Updates to the converter.</strong> The <code>openapi-3.0</code> feature supports Swagger 2.0 format API descriptions in the <code>META-INF</code> directory of an application and automatically converts them to Swagger 3.0 format. Previously only simple descriptions were accepted but in this beta many useful features are added:
+
+<ul>
+<li>array and object types in parameter schemas and in component descriptions and including nested arrays and objects</li>
+<li>parameters which are <code>$ref</code> objects referring to <code>in: body</code> parameters</li>
+<li>example objects in schemas, properties and responses</li>
+<li>default values specified for parameters</li>
+<li>tags in the top level of the document and in endpoint operations</li>
+</ul>
+
+Some Swagger 2.0 features are also known as limitations:
+
+<ul>
+<li><code>collectionFormat</code> in parameter object</li>
+<li>definitions including <code>allof</code></li>
+<li>external documentation object</li>
+<li><code>basePath</code> object</li>
+</ul></li>
+
+<li><strong>Updated programming interface (API).</strong> Application developers now have an interface to configure and customize the auto-generation of OpenAPI documents, including the ability to provide programmatic OpenAPI models to augment or replace annotation scanning.  Here are the updated interfaces:
+
+<ul>
+
+<li>The <code>io.swagger.oas.web.OpenAPIConfigBuilder</code> interface is the main service that allows for the customization of the OpenAPI v3 processing in Liberty. It allows the application developer to receive framework-dependent environment variables to process during the build of a new <code>OpenAPIConfig</code> object.
+
+[code language="java"]
+public interface OpenAPIConfigBuilder {
+OpenAPIConfig build(Map<String, Object> environment);
+}
+[/code]
+</li>
+
+<li>The <code>io.swagger.oas.web.OpenAPIConfig</code> interface is a container for all configuration parameters pertaining to OpenAPI v3 processing. With this interface you can provide a complete OpenAPI model, control aspects of annotation scanning (including the ability to disable it), and provide other helper services such as a custom filter, reader and scanner.
+<em>[Beta] For the current Beta, only the <code>getOpenAPI()</code> method from <code>OpenAPIConfig</code> is processed.</em>
+
+[code language="java"]
+public interface OpenAPIConfig {
+OpenAPI getOpenAPI();
+String getFilterClass();
+String getReaderClass();
+String getScannerClass();
+Set<String> getIgnoredClasses();
+Map<String, Object> getOptions();
+Set<String> getResourceClasses();
+Set<String> getResourcePackages();
+boolean isScanDisabled();
+}
+[/code]
+</li>
+
+<li>The <code>io.swagger.oas.web.OpenAPIScanner</code> interface allows an application developer to provide a custom scanner. Essentially this overrides Liberty's annotation scanning.
+<em>[Beta] This service is not currently enabled in the Beta, but its interface is exposed to provide an illustration of the complete programming model.</em>
+
+[code language="java"]
+public interface OpenAPIScanner {
+Set<Class<?>> classes();
+Map<String, Object> resources()
+}
+[/code]
+</li>
+
+<li>The <code>io.swagger.oas.web.OpenAPIReader</code> interface allows an application developer to provide a custom reader. Essentially this overrides Liberty's annotation and document processing. 
+<em>[Beta] This service is not currently enabled in the Beta, but its interface is exposed to provide an illustration of the complete programming model.</em>
+
+[code language="java"]
+public interface OpenAPIReader {
+OpenAPI read(OpenAPIConfig configuration, OpenAPIScanner scanner)
+}
+[/code]
+</li></ul></li>
+
+<li><strong>New SPI for OSGi bundles!</strong> Liberty's <code>openapi-3.0</code> feature introduces an interface for OSGi bundles (user or product extensions) running in Liberty to provide OpenAPI v3 documentation for their APIs. These SPIs can be found inside <code>/wlp/dev/spi/spec</code>. Simply register an implementation of the <code>com.ibm.wsspi.openapi.OASProvider</code> interface into the OSGi framework to contribute the documentation.
+
+Here's a snippet of these interfaces:
+
+<ul>
+<li>This interface is the main service that SPI users must implement in order to contribute documentation into the overall OpenAPI v3 feature. You must register one <code>OASProvider</code> per context root that you wish to document. The different set of results means that you can support different document variations, such as for different languages.
+
+[code language="java"]
+public interface OASProvider {
+    List<OASProviderResult> getResults();
+    String getContextRoot();
+    default boolean isPublic() {
+        return false;
+    };
+}
+[/code]
+</li>
+<li>This interface encapsulates a single OpenAPI v3 document, either using the OpenAPI model or a YAML/JSON text formatted as a Java String.  It has a configuration attached to it, which provides metadata about the document.
+
+[code language="java"]
+public interface OASProviderResult {
+    OpenAPI getOpenAPI();
+    String getDocument();
+    default OASProviderConfig getOASProviderConfig() {
+        return OASProviderConfig.defaultConfig();
+    }
+}
+[/code]
+</li>
+<li>This helper class encapsulates a set of support options that can be linked to a particular OpenAPI v3 document.
+<em>[Beta] For the Beta, we do not take different languages into account.  However, the method is there as a preview of upcoming capability. </em> 
+
+[code language="java"]
+public final class OASProviderConfig {
+    private String language;
+
+    public String getLanguage() {
+        return this.language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        OASProviderConfig config = (OASProviderConfig) o;
+        return Objects.equals(this.language, config.language);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.language);
+    }
+
+    public static OASProviderConfig defaultConfig() {
+        return new OASProviderConfig();
+    }
+}
+[/code]
+</li></ul></li></ul>
+
+For more information, see the <a href="https://www.ibm.com/support/knowledgecenter/en/was_beta/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_api_openapi.html">Knowledge Center</a>.
+
+To join WebSphere OpenAPI's external slack channel, please send an email to <a href="mailto:arthurdm@ca.ibm.com">arthurdm@ca.ibm.com</a> and you'll receive an invitation. That's where we talk to various members of the OpenAPI community about our Java OpenAPI v3 development.
+
+<h4>WebSphere Developer Tools updates</h4>
+
+The New Open API Definition Wizard allows developers of REST API to not only create Swagger 2.0 JSON definitions but also new Open API 3.0 JSON files with basic content or with sample content. This allows the API developer to get started with a basic or sample template from which to build their Open API document.
+
+An Eclipse validation framework-based validator has been added to provide some rule-based validation of Open API 3.0-based JSON files. This allows REST API developers to validate their definitions up-front, view the errors in the Source view of the JSON Editor, and quickly fix the issue, prior to deploying to the server.
+
+Another enhancement is the application detection logic to automatically configure Liberty with the Open API 3.0 feature. If an Open API 3.0 file exists in the <code>META-INF</code> folder of a Web app, then when the app is deployed to the Liberty Server, the Open API 3.0 feature is automatically added to the Liberty Server Configuration feature list, if it isn't already added.
+
+To try it out:
+
+<ol>
+<li>Install <a href="https://developer.ibm.com/wasdev/downloads/liberty-profile-using-eclipse/">WebSphere Application Server Developer Tools For Eclipse</a> and create a Liberty server.</li>
+<li>From a Web project, right-click <strong>New > Open API Definition File</strong> to open the wizard. The wizard allow you to still generate Swagger 2.0 files but it defaults to Open API 3.0 files. You can choose between a skeleton template or a sample template with more Open API 3.0 elements as the initial content of the new file. The wizard only generates the Open API 3.0 file into the <code>META-INF</code> folder of a Web application.</li>
+</ol>
+
+By default, the validator is turned on in Web projects and it validates any Open API 3.0 JSON files in the Web project upon build. The validator can also be run directly on any workspace Open API 3.0 JSON file using the <strong>Validate</strong> option when you right-click the file.
+
+For more information, see:
+
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/was_beta_devtools/com.ibm.websphere.wdt.doc/topics/t_restapi_create.htm">Creating a REST API definition file</a></li>
+<li><a href="https://www.ibm.com/support/knowledgecenter/was_beta_devtools/com.ibm.websphere.wdt.doc/topics/c_restapi_swag_valid.htm">Validation for Open API definition files</a></li>
+<li><a href="https://swagger.io/announcing-openapi-3-0/">OpenAPI 3.0 release announcement</a></li>
+</ul>
+
+<a name="microprofile"></a>
+
+<h2> MicroProfile updates</h2>
+
+<h3>MicroProfile Config API feature</h3>
+
+The MicroProfile Config specification provides a single way to view and access multiple sources of configuration, such as properties files and environment variables, including <code>bootstrap.properties</code>, user-level properties files, registered Java classes that implement the ConfigSource API, and the Java <code>System.properties</code>.
+
+Building systems as collections of independent microservices increases the number of services that need to be managed. As developers of microservices, we want to be able to update configuration data in one place and for that update to affect multiple microservices. Tools such as containerisation, service meshes, and vendors' cloud configuration services can be used help with service configuration. For our code to be portable, however, we want the applications to be insulated from vendor-specific APIs and to access different configuration data sources in a consistent way.
+
+The well-known 12 factors for microservices refer to configuration as "everything that is likely to vary between deploys". It is not just configuration values that vary as microservice code passes along the stages of a devOps pipeline. Different stages in the pipeline often use different configuration sources for a single piece of configuration data.
+
+The rising proportion of code that is reused or shared across systems (eg using shared services or Docker containers) also means that components are being written to be more and more configurable. Even while a component is 'live' in production, the environment it is running in may be more dynamic that traditional systems and some components may require a means to update part of the configuration without restarting the application.
+
+All this means that there is an increasing need to make fully configurable components with settings that that can be changed without requiring any change, repackaging, or restarting the component itself. There have been a number of attempts at providing such a Java configuration API including Spring Cloud Config, Apache Commons, Deltaspike and Tamaya, and Netflix Archaius but none has become a defacto standard and there is currently no official Java language API.
+
+The <a href="https://projects.eclipse.org/proposals/eclipse-microprofile">Eclipse MicroProfile</a> initiative exists for 'Optimizing Enterprise Java for a microservices architecture' and, after the initial base platform of existing services was defined, the Microprofile Configuration API was <a href="https://groups.google.com/forum/#!msg/microprofile/l8a8a-sVGag/7HlXsbMLBgAJ">the first new API released by the MicroProfile community</a>. The API allows for a consistent means to access configuration data from pluggable configuration sources. Configuration properties can be injected using Java CDI in a form that is easy to consume. Data values and sources can vary across the devOps pipeline without code change or repackaging, and dynamic and fully typed data is catered for.
+
+For more information, see the <a href="https://www.ibm.com/support/knowledgecenter/en/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_microprofile_appconfig.html">Knowledge Center</a>.
+
+<h3>MicroProfile Fault Tolerance</h3>
+
+The increasing size of 'web-scale' applications, newer architectures that are as likely to 'scale out' as to 'scale up', and the rising popularity of microservice architectures all contribute to the growing number of services that can be involved in a single business application. When combined with a utility model for service provision it is increasingly important to build fault tolerance into our system architecture.
+
+Fault tolerance can be improved using a number of well tested approaches that handle failure:
+
+<ul>
+<li><strong>TimeOut</strong>: Limit the amount of time we are prepared to wait for a result</li>
+<li><strong>RetryPolicy</strong>: Control how much we are prepared to re-submit a request</li>
+<li><strong>Fallback</strong>: Specify what should we do when the primary service cannot be used successfully</li>
+<li><strong>Bulkhead</strong>: If calls to a service are slow (perhaps it is overloaded or we are timing out), specify what proportion of our local resources we are prepared to get involved in the traffic jam</li>
+<li><strong>CircuitBreaker</strong>: When a service is proving unreliable, for example timing out, we can choose to 'fail fast'  by automatically failing calls to it under control</li>
+</ul>
+
+With the Microprofile Fault Tolerance specification, we can control all these aspects with easy-to-use Java annotations at a method or class level that is independent of any particular vendor or implementation library.
+
+For more information, see the <a href="https://www.ibm.com/support/knowledgecenter/en/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_microprofile_fault_tolerance.html">Knowledge Center</a>.
+
+<h2>What’s already in there?</h2>
+
+The July Liberty beta included the JSON Binding 1.0 and JSON Processing 1.1 features.
+
+Take a look at the previous beta announcements for a full list of stuff added since the <a href="/wasdev/blog/2017/06/13/new-release-websphere-liberty-17-0-0-2/">17.0.0.2</a> release in June 2017:
+
+<ul>
+<li><a href="/wasdev/blog/2017/07/07/beta-websphere-liberty-tools-july-2017/">July 2017 beta</a></li>
+<li><a href="/wasdev/blog/2017/06/13/beta-websphere-liberty-tools-june-2017/">June 2017 beta</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

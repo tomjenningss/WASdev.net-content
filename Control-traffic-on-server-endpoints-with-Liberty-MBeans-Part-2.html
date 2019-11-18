@@ -1,0 +1,58 @@
+With the Liberty December beta, we introduced the first look at functionality that provided a new Java Management Extension (JMX) Mbean to control server endpoints, which I described in <a href="/wasdev/blog/2017/12/21/mbean-controls-server-endpoints/">my 12/2017 blog post</a>.  In that post, I promised that we’d add control of additional endpoint types in a future release and we did so with the first quarter 2018 <a href="/wasdev/blog/2018/03/16/microprofile-1-3-liberty-18001/">WebSphere Liberty 18.0.0.1 release</a>, plus some more!
+
+As part of our commitment to actively listen and respond to your requests for new functionality, this release delivers everything requested by <a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&amp;CR_ID=95794">Request For Enhancement (RFE) 95794 Status management function for ActivationSpec</a>, namely starting and stopping messaging endpoints using an MBean, and the ability to control whether they automatically start when the associated application starts.  Because we delivered this new function to the <a href="https://openliberty.io/downloads/">open source Open Liberty project</a>, it is now available in our fully supported <a href="/wasdev/blog/2018/03/16/microprofile-1-3-liberty-18001/">WebSphere Liberty 18.0.0.1</a>, which is built on Open Liberty.  Let’s look at what’s changed since the beta.
+
+<h2>Enabling the ServerEndpointControl MBean</h2>
+
+As discussed in my December blog post, we have created a new JMX MBean, ServerEndpointControl.  In my blog post, I noted that you needed to add the <code>endpointControl-1.0</code> feature to the <code>featureManager</code> of your <code>server.xml</code> to enable this MBean.  Now that this new function has moved from beta to released, the MBean is available without specifying any features and if you added <code>endpointControl-1.0</code> to your <code>server.xml</code>, you’ll need to remove it or you’ll get a warning about an unrecognized feature.  Once your server is started, you can connect using any JMX tool like JConsole (for more details, see <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_admin_jmx.html">the Knowledge Center docs</a>). Once connected, navigate to the MBean with the ObjectName <code>WebSphere:feature=kernel,name=ServerEndpointControl</code>.
+
+<h2>Listing available endpoints</h2>
+
+As discussed in my previous blog post, you can list the available endpoints of a server using the MBean operation <code>listEndpoints()</code>.  The results of the operation can be used to determine the ’target’ name of an endpoint, which is needed to pause or resume it.  In my blog post, I noted this operation would only return <code>httpEndpoints</code> but it will now also return any messaging endpoints.  Here’s an example of the output from a server in which I have a default <code>httpEndpoint</code> and several MDBs:
+
+<img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2018/03/fred-activationspec-1024x551.png" alt="" width="640" height="344" class="aligncenter size-large wp-image-24372" />
+
+In this example, I have an installed application, <code>MsgEndpointApp</code>, which has an EJB module, <code>MsgEndpointEJB.jar</code> with several MDBs, including <code>ConcurBMTNonJMS</code> and <code>EndpointBMTJMS</code>.
+
+<h2>Controlling the state of endpoints at runtime</h2>
+
+In part 1 of my blog, I discussed how to use the <code>pause()</code> and <code>resume()</code> operations of the MBean to control the state of endpoints.  Those operations remain unchanged but I want to give you an example of pausing and resuming several endpoints at once.  If I want to stop inbound traffic to both the <code>defaultHttpEndpoint</code> and the <code>EndpointBMTJMS</code> endpoints, I invoke the operation with a comma-separated list of targets (where a target is the endpoint name returned by the <code>listEndpoints()</code> operation) like this:
+
+[code lang="java"]
+pause(“defaultHttpEndpoint,MsgEndpointApp#MsgEndpointEJB.jar#EndpointBMTJMS”)
+[/code]
+
+Similarly, I can restart the flow of inbound traffic on those two endpoints using:
+
+[code lang="java"]
+resume(“MsgEndpointApp#MsgEndpointEJB.jar#EndpointBMTJMS,defaultHttpEndpoint”)
+[/code]
+
+The order of the targets is not important.  In part one, I didn’t discuss using the <code>server</code> command to control endpoints, so I’ll take the opportunity to do so now.  In that post I noted that, depending on your operational needs, you could choose to use the <code>EndpointControl</code> MBean (new) or the <code>server</code> command (existing).  See <a href="/wasdev/blog/2017/12/21/mbean-controls-server-endpoints/">that post</a> for more details on why you might choose one over the other.  One advantage of the <code>server</code> command approach is that you don’t need any additional tools like JConsole.  The <code>server</code> command is the same command as used to start the server but with different parameters.
+
+To issue the same pause/resume operations as above, you would type:
+
+<code>Server pause &lt;server_name&gt; --target=defaultHttpEndpoint,MsgEndpointApp#MsgEndpointEJB.jar#EndpointBMTJMS</code>
+
+and:
+
+<code>server resume server_name&gt; — target=defaultHttpEndpoint,MsgEndpointApp#MsgEndpointEJB.jar#EndpointBMTJMS</code>
+
+<h2>Controlling the initial state of endpoints</h2>
+
+I mentioned earlier that we were delivering all the functionality requested by an RFE.  In addition to requesting the ability to control the state of messaging endpoints using an MBean, the RFE also requested functionality that we have in WebSphere Application Server traditional: The ability to control whether a messaging endpoint is started automatically when the associated application starts.
+
+Until now, in Liberty, if the application associated with a messaging endpoint was started, the endpoint was started.  This could result in messages beginning to flow into the MDB before the application was ready.  You can now control this using the new <code>autoStart</code> attribute of the <code>activationSpec</code> and <code>jmsActivationSpec</code> server configuration elements.  Because of <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/cwlp_migration.html">Liberty’s zero-migration policy</a>, the default value for <code>autoStart</code> is <code>true</code>; if you want to change it, you’ll need to explicitly state a value of <code>false</code> for the attribute like this:
+
+[code lang="xml"]
+<activationSpec autoStart="false" id="myActSpec"></activationSpec>
+<jmsActivationSpec autoStart="false" id="myJMSActSpec"></jmsActivationSpec>
+[/code]
+
+With <code>autoStart</code> set to <code>false</code>, you’ll need to use either the <code>EndpointControl</code> MBean or the <code>server</code> command to start the messaging endpoint when you’re ready for messages to start flowing into the endpoint.
+
+<h2>Feedback</h2>
+
+To recap, for the <a href="/wasdev/blog/2018/03/16/microprofile-1-3-liberty-18001/">Liberty 18.0.0.1 release</a>, we have added a new endpoint control MBean that allows you to query and control the state of both HTTP and messaging endpoints.   You can also now control the state of message endpoints using the existing <code>server</code> command.  And, finally, you can now configure whether the messaging endpoint starts automatically with the associated application.
+
+Thanks for your feedback, particularly via the RFE process, which is one of the ways you can help us prioritize our Liberty development efforts.

@@ -1,0 +1,171 @@
+<p class="ibm-btn-row pn-p40">
+    <a class="ibm-btn-sec ibm-btn-blue-50" title="Download Liberty 17.0.0.2"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download Liberty 17.0.0.2</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a>
+    </p>
+    
+    What's new in this release?
+    
+    <ul>
+    <li><a href="#Liberty">Liberty updates</a></li>
+    <li><a href="#WDT">WebSphere Developer Tools (WDT) updates</a></li>
+    <li><a href="#Migration">Migration Toolkit updates</a></li>
+    </ul>
+    
+    <a name="Liberty"></a>
+    
+    <h2>Liberty Updates</h2>
+    
+    <h3>Licensing</h3>
+    
+    You can now upgrade from the non-warranted (ILAN) version of Liberty to a supported (IPLA) Liberty Core edition. You can easily take the zips from <a href="http://wasdev.net">WASdev</a>, develop with them, create server packages and easily apply a license and deploy them into production.
+    
+    Moreover, if necessary, you can now apply a license archive to switch from an edition with a more advanced feature set e.g. Network Deployment to an edition with a more basic feature set e.g. Liberty Core.
+    
+    <h3>Social Login feature</h3>
+    
+    Social login is a form of single sign-on (SSO) that enables users to sign in to a website by using their existing social media account instead of creating an account specifically for the website. You can configure a Liberty server so that users can authenticate to websites that are hosted on the Liberty server by logging in with their social media accounts. Choose from the predefined social media platform configurations, or define your own configuration for any social media platform that is based on the <code>OAuth 2.0</code> or <code>OpenID Connect 1.0</code> standards.
+    
+    This is enabled by the <code>socialLogin-1.0</code> feature. You can configure social login for one or more of the following social media platforms: Facebook, GitHub, Google, LinkedIn, Twitter and any <code>OAuth 2.0</code> or <code>OpenID Connect 1.0</code> social media platforms.
+    
+    Configuration includes three steps:
+    
+    <ul>
+    <li>Register your Liberty server on the social media platform, acquiring an application ID and secret if needed. For example, here are the instructions for <a href="https://developers.facebook.com/docs/apps/register">Facebook</a>.</li>
+    <li>Add a social media configuration element (e.g. <code>facebookLogin</code>) in <code>server.xml</code> and configure it with the application ID and secret.</li>
+    <li>Import the social media endpoint's certificate into the Liberty server's trust store.</li>
+    </ul>
+    
+    Please see the <a href="https://www.ibm.com/support/knowledgecenter/en/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_sec_sociallogin.html">Knowledge Centre</a> for more information.
+    
+    <h3>JPA container feature update</h3>
+    
+    The <code>jpaContainer-2.1</code> feature provides a JPA container implementation without limiting you to the core JPA function in EclipseLink. You can plug in any version of any third party JPA persistence provider implementation that is compliant with the <code>JPA 2.1</code> specification, including EclipseLink with extensions like MOXy and JPA-RS.
+    
+    <h3>API Discovery feature update</h3>
+    
+    This feature updates the Swagger libraries that are part of the <code>apiDiscovery-1.0</code> Liberty feature to their most recently released open source levels.
+    
+    The Swagger libraries, UI and code generation tool have been updated to their latest levels to match the current development experience with open source. This includes fixes and enhancements up to <code>Swagger-core v1.5.12</code>.
+    
+    The API Discovery feature in Liberty provides native <code>Swagger 2.0</code> support for web applications, which means that you don't need to include any third-party <code>JAR</code> files in each of your applications to use the Swagger annotations, nor do you need to deploy and manage a separate Swagger UI application.
+    
+    In <code>17.0.0.2</code> we have upgraded Liberty's Swagger packages to the latest versions available on Open Source, allowing you to take advantage of the latest annotations and recent functionality additions to the UI (such as the improved authorization flow). We have also picked up dozens of bug fixes from the Open Source community. So in summary, a more modern and stable API experience!
+    
+    For more information, please see our <a href="https://www.ibm.com/support/knowledgecenter/en/SS7K4U_liberty/com.ibm.websphere.wlp.zseries.doc/ae/twlp_api_discovery.html">Knowledge Center</a> or our <a href="https://github.com/microservices-api/websphere-connect">WebSphere Connect hub</a>, which contains various links to videos, blogs and tutorials related to the API Discovery feature.
+    
+    <h3>New Connection Pool MXBean counter</h3>
+    
+    An <code>InUseTime</code> counter attribute has been added to the <code>ConnectionPool</code> MXBean as part of the <code>monitor-1.0</code> feature. This new counter will make it easier for users transitioning from traditional WAS to Liberty because it provides similar functionality. See <a href="https://developer.ibm.com/wasdev/blog/2017/06/28/how-to-tell-if-your-app-server-is-sick-new-in-17-0-0-2/">How to tell if your app server is sick (new in 17.0.0.2)</a> for more details.
+    
+    Please see the <a href="https://www.ibm.com/support/knowledgecenter/en/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_mon_connectionpools.html">Knowledge Center</a> for more information.
+    
+    <h3>JDBC 4.2 support</h3>
+    
+    You can now configure and use JDBC drivers that meet the <code>4.2 MR</code> (maintenance release) specification. This requires the new feature, <code>jdbc-4.2</code>. This spec is backwards compatible with the <code>4.1</code> spec. You will need to install the feature from the Liberty repository using the <code>bin/installUtility install jdbc-4.2</code> command from your Liberty runtime directory.
+    
+    <h3>Admin Center feature updates</h3>
+    
+    The Java Batch tool of the Admin Center (the <code>adminCenter-1.0 feature</code>) added <strong>Purge</strong> to the list of actions for job instances. <strong>Purge</strong> deletes all database entries and, optionally, deletes job logs associated with the job instance.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/1.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/1.png" alt="" width="1081" height="391" class="alignnone size-full wp-image-22673" /></a>
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/2.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/2.png" alt="" width="391" height="215" class="alignnone size-full wp-image-22674" /></a>
+    
+    <strong>Restart</strong> of a job instance from the Java Batch Tool was enhanced to allow editing of job parameters instead of simply reusing the parameters from the previous execution. Parameters can now be added, removed, and edited.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/3.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/3.png" alt="" width="618" height="482" class="alignnone size-full wp-image-22675" /></a>
+    
+    Additional <strong>search criteria</strong> was enabled to filter information about job instances displayed on the Java Batch tool dashboard. Filtering now includes case insensitive searches for submitter, application, and batch job name. A wildcard character (*) can be entered into the search value for these fields. Also added was a filter for last update range to display active job instances between the specified dates.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/4.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/4.png" alt="" width="1083" height="387" class="alignnone size-full wp-image-22676" /></a>
+    
+    All search criteria, except for dates, can be easily selected from values displayed in the Job Instance table.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/5.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/5.png" alt="" width="1167" height="156" class="alignnone size-full wp-image-22677" /></a>
+    
+    Or, using the filter autocomplete typing and suggestion popup feature, place the cursor within the filter box area and begin typing to quickly see a list of valid matching filter values to select from for entering search criteria.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/6.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/6.png" alt="" width="1078" height="331" class="alignnone size-full wp-image-22678" /></a>
+    
+    For each search 'pill' in the filter box area, an 'x' button was added which will remove that search criteria from the current filter box area. Afterwards, select the<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/magglass.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/magglass.png" alt="" width="27" height="30" class="alignnone size-full wp-image-22679" /></a> button to re-filter the list of job instances with the new criteria.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/7.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/7.png" alt="" width="1050" height="234" class="alignnone size-full wp-image-22680" /></a>
+    
+    <h4>Deploy tool updates</h4>
+    
+    The Java Batch tool was also updated to now persist user tool data, such as which columns to display within the tables or the maximum number of job instances to fetch for each filtered query made, to the server. Previously this data was stored as a browser cookie. Now these settings will follow the user even if they switch browsers or computers.
+    
+    For Liberty Server Package and Node.js Application Package deployments where the package being deployed is not local to the target host, the <code>remoteFileAccess</code> permission for the target host(s) is no longer required.
+    
+    When a user browses for a file or drags a file to drop onto the Deployment Parameters section, the <strong>Package directory</strong> field for the <strong>Liberty Server Package</strong> deployment rule or the <strong>Application directory</strong> field for the <strong>Node.js Application Package</strong> deployment rule is grayed out and is no longer required or used.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/szvonek.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/szvonek.png" alt="" width="1634" height="1118" class="alignnone size-full wp-image-22681" /></a>
+    
+    <a name="WDT"></a>
+    
+    <h2>WebSphere Developer Tools (WDT) updates</h2>
+    
+    <h3>Rapid development using the Liberty Maven plugin and WDT for Eclipse</h3>
+    
+    We’ve made significant updates to the <code>liberty-maven-plugin</code> and Eclipse tools to improve the developer experience when working with WebSphere Liberty in a Maven environment. The <code>liberty-maven-plugin</code> has been updated to include Loose Application support for web applications that enables the WebSphere Liberty runtime to process updates lightning fast! The Eclipse tools can now detect Maven web application projects that are configured to work with the new <code>liberty-maven-plugin</code> and can automatically create a server in the workbench. You can then iteratively develop and debug your web application within Eclipse and then build and package your application using Maven. The end result is a cohesive Maven development experience.
+    
+    To try out the new experience simply follow these steps:
+    
+    <ul>
+    <li>Use the following command to generate the sample project from an archetype:
+    <code>mvn archetype:generate -DarchetypeGroupId=net.wasdev.wlp.maven -DarchetypeArtifactId=liberty-archetype-webapp -DarchetypeVersion=2.0 –DwlpPluginVersion=2.0 -DgroupId=ServletSample -DartifactId=ServletSample -Dversion=1.0</code></p></li>
+    <li><p>Import your project into the latest WDT using <code>File &gt; Import… &gt; Existing Maven Projects</code></p></li>
+    </ul>
+    
+    <p>After importing your project a dialog will prompt you to select whether you would like to automatically create a server in the Servers view with your application already published.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/maven-liberty.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/maven-liberty.png" alt="" width="463" height="153" class="alignnone size-full wp-image-22672" /></a>
+    
+    You can now efficiently develop your application within the workbench whilst reaping the benefits of Maven.
+    
+    Here are some things you can try:
+    
+    <ul>
+    <li>Run your web application by opening the context menu on a resource in the Project Explorer view and selecting <code>Run As &gt; Run On Server</code></li>
+    <li>Make updates to an application resource and see the server pick up the changes on-the-fly</li>
+    <li>Debug your web application by setting a breakpoint in your code and using the <code>Debug As &gt; Debug On Server action</code></li>
+    <li>Perform actions like <code>Start</code>, <code>Stop</code>, and <code>Open Log Files</code> on the generated server in the Servers view</li>
+    <li>Use the Servers view to see a clear representation of the server configuration files within your Maven project. The files listed under the Maven Target folder are derived from your Maven project’s target folder. These files are intended for read-only consumption. To make updates to your server’s configuration use the files that are listed directly under the server that correspond to the files in your Maven project’s <code>src</code> folder</li>
+    <li>If you run <code>mvn clean</code>, or any other goal from within the workbench that causes the Liberty files to be deleted, the server and its associated runtime will be automatically removed from the workbench. Running <code>mvn install</code> or one of the <code>liberty-maven-plugin</code> goals that re-install the server will reinstate the server in the Servers view. <em>Note: Maven commands executed from outside of Eclipse will require refreshing the Project Explorer view in order for the workbench to process the changes</em></li>
+    <li>Make changes to your <code>liberty-maven-plugin</code> configuration in your Maven project’s <code>pom.xml</code> and use the <code>Maven &gt; Update project…</code> menu option to update the server and runtime instances within the workbench</li>
+    </ul>
+    
+    <h3>Further WDT updates</h3>
+    
+    Projects with a location outside your Eclipse workspace can now be deployed to a Liberty Docker server when running applications directly from the workspace.
+    
+    This means that you can use the running applications directly from the workspace with a Liberty Docker server even when your projects are imported from a local git repository. If you deploy one of these projects to the server it will automatically create a new container with the volumes needed to access that project and other projects in the same directory locally.
+    
+    For supporting projects with a location outside of the workspace:
+    
+    If a project is imported into the Eclipse workspace without copying it, such as importing a project from a local git clone then the location of the project is not in the Eclipse workspace folder. In previous versions, only projects located within your Eclipse workspace folder could be deployed to a Liberty Docker server with "running applications directly from the workspace" enabled. Now projects that are not located in your Eclipse workspace folder can also be deployed. When you deploy such a project to the server it will ask you if you want to create a new container with the additional volume needed to access the project from within the container. A commit will be created on your current container and a new container will be created from the image with the additional volume. This way nothing you have done so far will be lost. Your project will then be deployed on the new container and you can run it and modify it taking advantage of the faster response times associated with running applications directly from the workspace.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/newContainerDialog.jpg"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/newContainerDialog.jpg" alt="" width="1157" height="473" class="alignnone size-full wp-image-22723" /></a>
+    
+    <p class="ibm-btn-row pn-p40">
+    <a class="ibm-btn-sec ibm-btn-blue-50" title="Download Liberty 17.0.0.2"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download Liberty 17.0.0.2</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a>
+    </p>
+    
+    <a name="Migration"></a>
+    
+    <h2>Migration Toolkit updates</h2>
+    
+    The Migration Toolkit for Application Binaries (binary scanner) continues to be enhanced in order to assist application developers and administrators with application migrations. Both the Eclipse-based source scanner and binary scanner contain bug fixes and a few new rules. Also, the Java SE rules were revisited for their complexity and severity. Many of the Java SE rules flag behavior changes that are unlikely to affect existing applications, and that can only be assessed after deploying the application. Therefore, the severity of many of the rules have been downgraded, and many have been changed to flag once per Eclipse project or archive. This provides a more accurate assessment of the Java SE migration effort.
+    
+    The new Application Migration Report makes it easier than ever to analyze your application binaries for migration to later releases of WebSphere traditional or Liberty. This report combines the content of the Application Evaluation Report (<code>--evaluate</code>), the Detailed Migration Analysis Report (<code>--analyze</code>), the Application Inventory Report (<code>--inventory</code>), and the feature list XML file (<code>--featureList</code>). The Application Migration Report is generated with the <code>--all</code> action, which is the new default action. The Application Evaluation Report can still be generated by specifying the <code>--evaluate</code> action explicitly.
+    
+    The Detailed Migration Analysis Report is redesigned to organize rule results by severity and then category. This makes it easier to navigate the report and find the rules that interest you the most.
+    
+    The Potential Deployment Problems section of the Application Inventory Report now contains information on archives with system level Java virtual machine (JVM) configuration. Certain JVM configuration settings, when set by an application, can cause server-wide issues because the system properties apply to the entire JVM.
+    
+    The <code>--featureList</code> action added support for the <code>--includePackages</code> and <code>--excludePagkages</code> options. These options affect which class files are analyzed, and provide more flexibility during feature list generation.
+    
+    Finally, the <code>--format=txt</code> option is no longer supported. Check out the <code>--format=json</code> support instead, which provides report content in a format ready for easy data analysis.
+    
+    <p class="ibm-btn-row pn-p40">
+    <a class="ibm-btn-sec ibm-btn-blue-50" title="Install the Eclipse-based migration tools"  href="/wasdev/downloads/#asset/tools-WebSphere_Application_Server_Migration_Toolkit">Get the Eclipse-based tools!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="/wasdev/downloads/#asset/tools-Migration_Toolkit_for_Application_Binaries">Get the command-line tool!</a>
+    </p>

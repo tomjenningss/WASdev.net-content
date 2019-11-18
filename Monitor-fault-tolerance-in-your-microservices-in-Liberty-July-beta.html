@@ -1,0 +1,89 @@
+Get metrics about the fault tolerance of your Java microservices with MicroProfile Metrics integration with <a href="https://github.com/eclipse/microprofile-fault-tolerance/releases/tag/1.1">MicroProfile Fault Tolerance 1.1</a> in the July 2018 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. We recently released <a href="/wasdev/blog/2018/06/29/java-ee-8-liberty-18-0-0-2/">WebSphere Liberty 18.0.0.2</a>, built on <a href="https://openliberty.io/blog/2018/06/29/full_java_ee_8_liberty_18002.html">Open Liberty 18.0.0.2</a>.
+
+Look out for more betas over the coming months. If you just can't wait, take a look at the <a href="https://openliberty.io/downloads/">daily builds of Open Liberty</a>.
+
+Follow Open Liberty happenings on <a href="https://twitter.com/openlibertyio">@OpenLibertyIO</a>.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#mpfault">Integrated metrics and disabling annotations with MicroProfile Fault Tolerance 1.1</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+
+<div id="mpfault" >
+<h2>Integrated metrics and disabling annotations with MicroProfile Fault Tolerance 1.1</h2>
+
+MicroProfile Fault Tolerance enables you to easily add smart error handling to your methods using annotations. For example, you can indicate that a method should be retried if it fails or should be stopped if it takes too long.
+
+Major changes in version 1.1 include:
+<ul>
+<li>Ability to disable individual Fault Tolerance annotations using config</li>
+<li>Integration with MicroProfile Metrics</li>
+</ul>
+
+New in 1.1 is the ability to disable individual Fault Tolerance annotations using the MicroProfile Config feature. For example, if you have a method <code>MyClient.methodA()</code> which is annotated with <code>@CircuitBreaker</code>, you can disable the circuit breaker by adding this configuration entry:
+
+[code]
+com.acme.test.MyClient/methodA/CircuitBreaker/enabled=false
+[/code]
+
+The integration with MicroProfile Metrics means that if you use <code>mpFaultTolerance-1.1</code> and <code>mpMetrics-1.1</code> together, you'll automatically get metrics for each of the methods annotated with a Fault Tolerance annotation. This allows you to see when your application is having problems, even as it's mitigating those problems to keep things running as smoothly as possible for your users.
+
+The following graph shows the average number of retries per request to a method annotated with <code>@Retry</code>. Even though the failures are masked by <code>@Retry</code>, the failure count is still visible in the metrics, allowing operators to be alerted and allowing them to see when the problem started. These methods can be gathered and graphed using Prometheus; for example:
+
+[caption id="attachment_24684" align="aligncenter" width="640"]<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2018/07/retry-graph.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2018/07/retry-graph-1024x612.png" alt="Graph of average number of retries per request to a method annotated with @Retry. Even though the failures are masked by @Retry, the failure count is still visible in the metrics, allowing operators to be alerted and allowing them to see when the problem started." width="640" height="383" class="size-large wp-image-24684" /></a> Graph of average number of retries per request to a method annotated with @Retry. Even though the failures are masked by @Retry, the failure count is still visible in the metrics, allowing operators to be alerted and allowing them to see when the problem started.[/caption]
+
+To enable Fault Tolerance metrics with annotations, include the following features in the <code>server.xml</code> (you don't need to specify the MicroProfile Config feature because it is automatically loaded as a dependency by <code>mpFaultTolerance-1.1</code>):
+
+[code lang="xml"]
+<featureManager>
+  <feature>mpFaultTolerance-1.1</feature>
+  <feature>mpMetrics-1.1</feature>
+</featureManager>
+[/code]
+
+Example use of fault tolerance annotations:
+
+[code lang="java"]
+@ApplicationScoped
+public class Example {
+
+  @Retry
+  @CircuitBreaker
+  public Result getResult(String userId) {
+    List<Widgets> widgets = fetchWidgets(userId);
+    return new Result(userId, widgets);
+  }
+
+}
+
+[/code]
+
+For more info:
+
+<ul>
+<li><a href="https://openliberty.io/guides/retry-timeout.html">Failing fast and recovering from errors (Open Liberty guide)</a></li>
+<li><a href="https://openliberty.io/guides/circuit-breaker.html">Preventing repeated failed calls to microservices (Open Liberty guide)</a></li>
+<li><a href="https://openliberty.io/guides/microprofile-fallback.html">Building fault-tolerant microservices with the @Fallback annotation (Open Liberty guide)</a></li>
+<li><a href="https://openliberty.io/guides/bulkhead.html">Limiting the number of concurrent requests to microservices (Open Liberty guide)</a></li>
+<li><a href="https://github.com/eclipse/microprofile-fault-tolerance/releases/tag/1.1">Fault Tolerance 1.1 spec</a></li>
+</ul>
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2018/06/08/certificates-map-users-junebeta/">June Liberty beta</a> included control over how custom X.509 certificates map to users in the user registry, and submitting usage statistics from your Liberty servers to IBM Cloud Private monitoring services.
+
+<h2>Looking for the latest?</h2>
+
+If you're visiting this post from the future and you're looking for the latest releases of Liberty, here are the links you're looking for:
+
+<a href="https://developer.ibm.com/wasdev/docs/new-in-latest-earlyaccess">Latest beta release</a>
+<a href="https://developer.ibm.com/wasdev/docs/new-latest-ga-download">Latest stable release</a>
+<a href="https://www.openliberty.io/downloads/">Open Liberty downloads</a>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

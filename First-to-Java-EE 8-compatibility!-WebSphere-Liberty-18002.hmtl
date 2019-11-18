@@ -1,0 +1,196 @@
+WebSphere Liberty is <a href="http://www.oracle.com/technetwork/java/javaee/overview/compatibility-jsp-136984.html">Java EE 8 compatible</a> and is now available to download. WebSphere Liberty is built on the open source <a href="https://openliberty.io/blog/2018/06/29/full_java_ee_8_liberty_18002.html">Open Liberty project</a>.
+
+Java EE 8 updates include reactive client and server-side events in JAX-RS 2.1, asynchronous events in CDI 2.0, Servlet 4.0 including HTTP/2 support, JSF 2.3 and JPA 2.2.
+
+As well as the Java EE 8 updates, you can now deploy your Spring Boot applications to Liberty, control certificate mapping to users, document your RESTful APIs with OpenAPI, more simply manage collective security, and configure single logout for single sign-on (SSO) applications.
+
+
+<h2>Join our free webcast</h2>
+
+Learn about Liberty V18.0.0.2, try it out, and ask questions of the team (choose the date that suits your timezone):
+
+<ul>
+<li><a href="http://ibm.biz/LibertyVpot1">11 July (1-3pm ET | 5-7pm UTC)</a></li>
+<li><a href="http://ibm.biz/LibertyVpot2">08 August (9-11am ET | 1-3pm UTC)</a></li>
+</ul>
+
+
+<h2>Download WebSphere Liberty 18.0.0.2 now</h2>
+
+<p class="ibm-btn-row pn-p40" style="clear:left">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download WebSphere Liberty 18.0.0.2"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download WebSphere Liberty 18.0.0.2</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+<h2>What's new in WebSphere Liberty 18.0.0.2?</h2>
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/10/OL_logomark_132_wht.png" alt="" width="262" height="191" class="alignleft size-full wp-image-23746" /></a>
+
+<p style="clear:left"></p>
+
+<ul>
+<li><a href="#javaee8">Full implementation of Java EE 8!</a></li>
+<li><a href="#convenience">Quickly enable Java EE 8 (Full or Web profile) with convenience features</a></li>
+<li><a href="#sslogout">Enable single logout of SAML sessions in your web app</a></li>
+<li><a href="#openapi">Document RESTful APIs in your Java apps with OpenAPI</a></li>
+<li><a href="#collectives">Manage high availability servers with Liberty collectives</a></li>
+<li><a href="#rfe">Request for enhancements (RFEs) completed in WebSphere Liberty 18.0.0.2</a></li>
+</ul>
+
+<div id="javaee8">
+<h3>Full support for Java EE 8 with convenience features</h3>
+
+WebSphere Liberty is the first Java EE 8 compatible application server! In fact, we're so first that they've not had a chance to update <a href="http://www.oracle.com/technetwork/java/javaee/overview/compatibility-jsp-136984.html">the official page</a> yet...
+
+WebSphere Liberty is built on the Open Liberty open source project, which contains the full Java EE 8 implementation (along with <a href="https://openliberty.io/blog/2018/06/08/java-microservices-microprofile.html">MicroProfile 1.3</a>). To find out more about the Java EE 8 features, see the <a href="https://openliberty.io/blog/2018/06/29/full_java_ee_8_liberty_18002.html">Open Liberty 18.0.0.2 blog post</a>.
+
+</div>
+
+<div id="convenience">
+<h3>Quickly enable Java EE 8 (Full or Web profile) with convenience features</h3>
+
+You can download <a href="/wasdev/downloads/#asset/runtimes-wlp-webProfile8">Liberty with Java EE 8 Web Profile runtime</a> (and <a href="/wasdev/downloads/#asset/runtimes-webprofile7-ibm-java">with the Java 8 SDK</a>) or <a href="/wasdev/downloads/#asset/runtimes-wlp-javaee8">Liberty with Java EE 8 Full Platform runtime</a>.
+
+You can enable all of the Java EE 8 features (or the more lightweight set of Web Profile features) with a single feature in your <code>server.xml</code>. Just add the relevant feature definition to your <code>server.xml</code>.
+
+For Java EE 8 Web Profile:
+
+[code lang="xml"]
+<featureManager>
+    <feature>webProfile-8.0</feature>
+</featureManager>
+[/code]
+
+Or for Java EE 8 Full Platform:
+
+[code lang="xml"]
+<featureManager>
+    <feature>javaee-8.0</feature>
+</featureManager>
+[/code]
+
+
+</div>
+
+
+<div id="sslogout">
+<h3>Enable single logout of SAML sessions in your web app</h3>
+
+Liberty as a SAML service provider is now equipped with the SAML single logout function which allows users to terminate all the login sessions established using SAML Web single sign-on (SSO). This single logout function can be initiated from either the service provider or the identity provider. Single logout improves security by avoiding abandoned login sessions, and can simplify administration by providing a centralized way to log out.
+
+Using SAML Web SSO, the user logs in to the identity provider once and receives unlimited access to different web applications without additional login prompts. It is not easy for the end user to be aware of all the opened web sessions and, as a result, they can end up with orphaned log-in sessions which might pose a security risk.
+
+This SAML single logout (SLO) function enables near-simultaneous logout of an end user. It also allows the users to terminate all their login sessions with one click of a mouse button and can be initiated from service provider or identity provider.
+
+To enable the SSO feature in the <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>samlWeb-2.0</feature>
+</featureManager>
+[/code]
+
+To configure the Liberty service provider (SP) for SAML single logout:
+
+For identity provider initiated logout, no additional configuration is required. An SLO endpoint URL is published in the client’s metadata, and SLO-capable identity providers can read the metadata and call it.
+
+To configure the Liberty service provider (SP) for SAML single logout, add a <code>samlWebSso20</code> element to <code>server.xml</code> with <code>spLogout="true"</code>:
+
+[code lang="xml"]
+    <server>
+     <samlWebSso20 id="sp2" ... spLogout="true" />
+     ...
+    </server>
+[/code]
+
+Subsequent calls to <code>HttpServletRequest.logout()</code> or <code>ibm_security_logout</code> are then upgraded to perform SAML single logout.
+
+The SingleLogoutService URL is <code>https://<hostname>:<sslport>/ibm/saml20/<SP configuration ID>/slo</code>. That URL will also be included in in the Liberty SP's metadata, available at <code>https://<hostname>:<sslport>/ibm/saml20/<SP configuration ID>/samlmetadata</code> 
+
+For more info:
+
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_config_saml_web_sso.html">Configuring SAML Web Browser SSO in Liberty (Knowledge Center)</a></li>
+</ul>
+
+</div>
+
+
+<div id="openapi">
+
+<h3>Document RESTful APIs in your Java apps with OpenAPI</h3>
+
+The new OpenAPI 3.1 (<code>openapi-3.1</code>) feature is an extension of the MicroProfile OpenAPI 1.0 (<code>mpOpenAPI-1.0</code>) feature. In addition to providing support for the <a href="https://github.com/eclipse/microprofile-open-api">MicroProfile OpenAPI 1.0 specification</a>, this feature also provides an aggregated view of APIs from multiple applications deployed in the server.
+
+To enable the OpenAPI 3.1 feature, add the feature definition to your <code>server.xml</code>:
+
+[code lang="xml"]
+
+           <featureManager>
+                  <feature>openapi-3.1</feature>
+          </featureManager>
+
+[/code]
+
+Then use one of the documentation methods specified in <a href="https://github.com/eclipse/microprofile-open-api/blob/master/spec/src/main/asciidoc/microprofile-openapi-spec.adoc#documentation-mechanisms">this section of the specification</a> for each of your applications. You can view the generated aggregated OpenAPI document in the endpoint <code>/api/docs</code>, or view the rendered user interface in the endpoint <code>/api/explorer</code>.
+
+Customize the URL path of the public endpoints by using MicroProfile Configuration. For example, setting the <code>mp.openapi.extensions.liberty.public.url</code> property to <code>/my/custom</code> changes the location of the aggregated document endpoint from <code>/api/docs</code> to <code>/my/custom/docs</code>. Similarly, the location of the rendered user interface changes from <code>/api/explorer</code> to <code>/my/custom/explorer</code>.
+
+You can designate APIs as private by setting the <code>mp.openapi.extensions.liberty.public</code> property to <code>false</code> at the application level. This setting hides APIs from the public endpoint view. Setting the <code>mp.openapi.extensions.liberty.enable.private.url</code> property to <code>true</code> makes private APIs available at the following private endpoints: <code>/ibm/api/docs</code> (aggregated document) and <code>/ibm/api/explorer</code> (UI).
+
+For more info:
+
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_api_openapi_agg.html">OpenAPI (Knowledge Center)</a></li>
+</ul>
+
+</div>
+
+
+<div id="collectives" >
+<h3>Manage high availability servers with Liberty collectives</h3>
+
+18.0.0.2 introduces a new single collective SSH key model which makes collective administration simpler and more secure. Previously, each collective member would have its own SSH key pair and its private key would be stored in the collective repository. Now, a single SSH key pair can be shared by all members of a collective without the storage of private keys. Also, z/OS users can now use SAF keyrings for remote authentication throughout the collective.
+
+Starting in 18.0.0.2, the single collective SSH key model is used by default. When a collective controller is created, the single collective-wide key pair is generated without having to configure or specify anything. When members join the collective, it receives the public key form the controller and adds it to its authorized keys file.  Alternatively, rather than generating a new SSH key pair, users can specify an existing key pair or SAF keyring to use when creating the controller.
+
+For more info:
+
+<ul>
+<li><a href="/wasdev/blog/2018/06/29/simplify-collective-security-liberty/">Simplify collective security</li>
+<li><a href="https://www.ibm.com/support/knowledgecenter/en/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/tagt_wlp_server_management.html?pos=2">Liberty collectives (Knowledge Center)</a></li>
+</ul>
+
+</div>
+
+
+
+<div id="rfe">
+<h2>Request for enhancements (RFEs) completed in WebSphere Liberty 18.0.0.2</h2>
+
+In this release, the following RFEs were completed for WebSphere Liberty:
+
+<ul>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=100571">RFE 100571: Enhanced Support for LDAP Certificate Filters in VMM</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=113782">RFE 113782: Logging and Tracing enhancements</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=118473">RFE 118473: Dynamic buffering of logs in memory</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=67263">RFE 67263: Enable HTTP/2 Protocol</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=85967">RFE 85967: Need JWT support in both WebSphere Application Server Traditional and Liberty</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=88226">RFE 88226: SAML single-logout profile support fro Liberty SAML Web SSO</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=88201">RFE 88201: Liberty Collective security must support the use of SAF keyrings and certificates for ssh</a></li>
+<!--<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=65166">RFE 65166: </a></li>-->
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=88543">RFE 88543: WebSphere Liberty Activation Spec Enhancement</a></li>
+</ul>
+
+</div>
+
+<p class="ibm-btn-row pn-p40">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download Liberty 18.0.0.2"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download Liberty 18.0.0.2</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/09/OL_badge-1024x306.png" alt="Built on Open Liberty" width="640" height="191" class="alignleft size-large wp-image-23627" /></a>
+
+We'd love you to get involved in any way that you can, such as testing the code in ways that you use Liberty and raising issues <a href="https://github.com/openliberty/">on GitHub</a>, or create pull requests on the code and documentation. You can contribute to discussions about Open Liberty on the <a href="https://groups.io/g/openliberty">mailing list</a>.
+
+
+
+<p style="clear:left"></p>

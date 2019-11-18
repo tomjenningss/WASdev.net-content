@@ -1,0 +1,125 @@
+Try out some of the <a href="http://microprofile.io/">MicroProfile 1.3</a> technologies, including MicroProfile Rest Client 1.0, MicroProfile Config 1.2, and MicroProfile OpenAPI 1.0, in the February 2018 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Check out the <a href="/wasdev/blog/2017/12/21/liberty-gradle-plugin-17-0-0-4/">17.0.0.4 release of WebSphere Liberty</a> which is built on the <a href="https://openliberty.io/news/2017/12/21/jsf-implementation-open-liberty-17004.html">17.0.0.4 release of Open Liberty</a>. Look out for more betas over the coming months. If you just can't wait, take a look at the <a href="https://openliberty.io/downloads/">daily builds of Open Liberty</a>.
+
+Follow Open Liberty happenings on <a href="https://twitter.com/openlibertyio">@OpenLibertyIO</a>.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#mprestclient">MicroProfile Rest Client 1.0</a></li>
+<li><a href="#mpconfig">MicroProfile Config 1.2</a></li>
+<li><a href="#mpopenapi">MicroProfile OpenAPI 1.0</a></li>
+<li><a href="#cdi20">CDI 2.0</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<div id="mprestclient" />
+
+<h2>MicroProfile Rest Client 1.0</h2>
+
+The <a href="http://microprofile.io/project/eclipse/microprofile-rest-client">MicroProfile Rest Client</a> builds on the JAX-RS 2.0 Client APIs to provide a type-safe approach for invoking RESTful services over HTTP.  This means writing client applications with more model-centric code and less "plumbing". You can create a Java interface that represents a remote RESTful service. Decorate the methods with appropriate <code>@Path</code>, <code>@GET</code>, <code>@POST</code>, etc. annotations, and then invoke those methods like a POJO and get the response from the remote service.
+
+To enable the MicroProfile Rest Client in the <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+    <feature>mpRestClient-1.0</feature>
+</featureManager>
+[/code]
+
+To find out more about the MicroProfile Rest Client in Liberty, see <a href="https://openliberty.io/news/2018/01/31/mpRestClient.html">Andy McCright's blog post</a> on the OpenLiberty.io website.
+
+<div id="mpconfig" />
+
+<h2>MicroProfile Config 1.2</h2>
+
+Building on version 1.1, MicroProfile Config 1.2 adds a number of new built-in converters, including <code>Class</code>, <code>List</code>, <code>Set</code> and automatic conversion for classes which have a suitable String constructor or static <code>valueOf</code> method. You can use this feature with either the <code>cdi-1.2</code> feature or the <code>cdi-2.0</code> feature.
+
+You can find a full list of changes since version 1.1 on the <a href="https://github.com/eclipse/microprofile-config/milestone/3?closed=1">MicroProfile Config 1.2 Milestone</a>.
+
+<h3>API/SPI changes</h3>
+
+The ConfigBuilder SPI has been extended with a method that allows for a converter with the specified class type to be registered (<a href="https://github.com/eclipse/microprofile-config/issues/205">#205</a>). This change removes the limitation in previous releases of being unable to add a lambda converter.
+
+<h3>Functional changes</h3>
+
+<ul>
+<li>Implementations must now support the array converter (<a href="https://github.com/eclipse/microprofile-config/issues/259">#259</a>). For the array converter, the programmatic lookup of a property (e.g. <code>config.getValue(myProp, String[].class)</code>) must support the return type of the array. For the injection lookup, an Array, List, or Set must be supported as well (e.g. <code>@Inject @ConfigProperty(name="myProp") private List&lt;MyObject&gt; propValue;</code>). </li>
+<li>Implementations must also support the common sense converters (<a href="https://github.com/eclipse/microprofile-config/issues/269">#269</a>) where there is no corresponding type of converters provided for a given class. The implementation must use the class’s constructor with a single string parameter, then try <code>valueOf(String)</code> followed by <code>parse(CharSequence)</code>.</li>
+<li>Implementations must also support Class converter (<a href="https://github.com/eclipse/microprofile-config/issues/267">#267</a>).</li>
+</ul>
+
+<h3>Specification Changes</h3>
+
+Specification changes: (<a href="https://github.com/eclipse/microprofile-config/issues/205">#205</a>), (<a href="https://github.com/eclipse/microprofile-config/issues/259">#259</a>), (<a href="https://github.com/eclipse/microprofile-config/issues/269">#269</a>), and (<a href="https://github.com/eclipse/microprofile-config/issues/267">#267</a>).
+
+<h3>Other changes</h3>
+
+The API bundle can work with either CDI 1.2 or CDI 2.0 in the OSGi environment (<a href="https://github.com/eclipse/microprofile-config/issues/249">#249</a>).
+
+To enable the MicroProfile Config 1.2 feature just add the following feature definition to your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+    <feature>mpConfig-1.2</feature>
+</featureManager>
+[/code]
+
+For more information about MicroProfile Config 1.2, see <a href="http://microprofile.io/project/eclipse/microprofile-config">the MicroProfile.io website</a>.
+
+<div id="mpopenapi" />
+
+<h2>MicroProfile OpenAPI 1.0</h2>
+
+The MicroProfile OpenAPI 1.0 feature (<code>mpOpenAPI-1.0</code>) is a preview implementation of the <a href="https://github.com/eclipse/microprofile-open-api">MicroProfile OpenAPI 1.0 specification</a>. In this beta, we've added support for more mechanisms from the MicroProfile OpenAPI 1.0 specification. MicroProfile OpenAPI 1.0 now handles all configurable items, fully supports filter, and handles more annotations.
+
+To try it out, add this feature to your <code>server.xml</code> list of features:
+
+[code lang="xml"]
+<featureManager>
+    <feature>mpOpenAPI-1.0</feature>
+</featureManager>
+[/code]
+
+Then use one of <a href="https://github.com/eclipse/microprofile-open-api/blob/master/spec/src/main/asciidoc/microprofile-openapi-spec.adoc#documentation-mechanisms">the documentation methods</a>. You can view the generated OpenAPI document in the endpoint <code>/openapi</code>, or view the rendered user interface at the endpoint <code>api/explorer</code>.
+
+<div id="cdi20" />
+
+<h2>CDI 2.0</h2>
+
+CDI 2.0 is shining new and implements the latest CDI spec. It contains quite a few nice capabilities, especially the very useful and powerful Configurator SPIs. The new feature <code>cdi-2.0</code> pulls in the Weld bundle 3.0.2. The following features of CDI 2.0 are available for use:
+
+<ul>
+<li>Asynchronous events</li>
+<li>Configurators for major SPI elements</li>
+<li>Configure or veto observer methods</li>
+<li>Add built-in annotation literals</li>
+<li>Apply interceptor on producers</li>
+</ul>
+
+To enable the CDI 2.0 feature just add the following feature definition to your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+    <feature>cdi-2.0</feature>
+</featureManager>
+[/code]
+
+For more information about CDI 2.0, see <a href="http://www.cdi-spec.org/download/">the CDI spec</a>.
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2018/01/19/microprofile-openapi-1-0-january-websphere-liberty-beta/">January Liberty beta</a> included MicroProfile OpenAPI 1.0 and JSON format logging.
+
+For supported features, take a look at <a href="/wasdev/blog/2017/12/21/liberty-gradle-plugin-17-0-0-4/">17.0.0.4</a>, which was released in December.
+
+<h2>Looking for the latest?</h2>
+
+If you're visiting this post from the future and you're looking for the latest releases of Liberty, here are the links you're looking for:
+
+<a href="https://developer.ibm.com/wasdev/docs/new-in-latest-earlyaccess">Latest beta release</a>
+<a href="https://developer.ibm.com/wasdev/docs/new-latest-ga-download">Latest stable release</a>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

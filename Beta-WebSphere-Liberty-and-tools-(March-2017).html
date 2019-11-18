@@ -1,0 +1,119 @@
+Here's the latest WebSphere Liberty beta and WebSphere Developer Tools (WDT).
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2017/03/14/new-release-websphere-liberty-17-0-0-1/">in March</a>.
+
+Look out for more betas over the coming months.
+
+<p class="ibm-btn-row pn-p40">
+<a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a>
+</p>
+
+<h2>What’s in the WebSphere Liberty beta for March?</h2>
+
+<h3>Rapid development using the Liberty Maven plugin and WDT for Eclipse</h3>
+
+We’ve made significant updates to the <code>liberty-maven-plugin</code> and Eclipse tools to improve the developer experience when working with WebSphere Liberty in a Maven environment. The <code>liberty-maven-plugin</code> has been updated to include Loose Application support for web applications that enables the WebSphere Liberty runtime to process updates lightning fast! The Eclipse tools can now detect Maven web application projects that are configured to work with the new <code>liberty-maven-plugin</code> and will automatically create a server in the workbench. You can then iteratively develop and debug your web application within Eclipse and then build and package your application using Maven. The end result is a cohesive Maven development experience. We’ve got more coming so stay tuned for updates! Let us know what you think on the <a href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">WASDev community forums</a>.
+
+To try out the new experience simply follow these steps:
+
+<ul>
+<li>Add the following content to a new or existing <code>settings.xml</code> file in the <code>${user.home}/.m2</code> folder:</li>
+</ul>
+
+<pre>
+<code lang="xml">
+&lt;settings&gt;
+ &lt;profiles&gt;
+  &lt;profile&gt;
+     &lt;id&gt;sonatype-snapshots&lt;/id&gt;
+     &lt;activation&gt;
+      &lt;activeByDefault&gt;true&lt;/activeByDefault&gt;
+     &lt;/activation&gt;
+     &lt;pluginRepositories&gt;
+       &lt;pluginRepository&gt;
+        &lt;id&gt;sonatype-snapshots-repo&lt;/id&gt;
+        &lt;name&gt;Sonatype Snapshots Repository&lt;/name&gt;
+        &lt;url&gt;https://oss.sonatype.org/content/repositories/snapshots/&lt;/url&gt;
+        &lt;releases&gt;
+         &lt;enabled&gt;false&lt;/enabled&gt;
+        &lt;/releases&gt;
+        &lt;snapshots&gt;
+          &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/snapshots&gt;
+       &lt;/pluginRepository&gt;
+     &lt;/pluginRepositories&gt;
+     &lt;repositories&gt;
+        &lt;repository&gt;
+         &lt;id&gt;sonatype-nexus-snapshots&lt;/id&gt;
+         &lt;name&gt;Sonatype Nexus Snapshots&lt;/name&gt;
+         &lt;url&gt;https://oss.sonatype.org/content/repositories/snapshots/&lt;/url&gt;
+         &lt;snapshots&gt;
+           &lt;enabled&gt;true&lt;/enabled&gt;
+         &lt;/snapshots&gt;
+          &lt;releases&gt;
+           &lt;enabled&gt;false&lt;/enabled&gt;
+          &lt;/releases&gt;
+         &lt;/repository&gt;
+       &lt;/repositories&gt; 
+   &lt;/profile&gt;
+ &lt;/profiles&gt;
+ &lt;activeProfiles&gt;
+   &lt;activeProfile&gt;sonatype-snapshots&lt;/activeProfile&gt;
+ &lt;/activeProfiles&gt;
+&lt;/settings&gt;
+</code>
+</pre>
+
+<ul>
+<li>Use the following command to generate the sample project from an archetype:
+<code>mvn archetype:generate -DarchetypeGroupId=net.wasdev.wlp.maven -DarchetypeArtifactId=liberty-archetype-webapp -DarchetypeVersion=2.0-SNAPSHOT -DgroupId=ServletSample -DartifactId=ServletSample -Dversion=1.0</code></p></li>
+<li><p>Run <code>mvn install</code> on your project</p></li>
+<li><p>Import your project into the WDT March Beta using <code>File &gt; Import… &gt; Existing Maven Projects</code></p></li>
+</ul>
+
+<p>After importing your project a server will get automatically generated in the Servers view with your application already published.
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/march-beta-3.jpg"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/march-beta-3.jpg" alt="" width="425" height="99" class="alignnone size-full wp-image-22051" /></a>
+
+You can now efficiently develop your application within the workbench whilst reaping the benefits of Maven.
+
+Here are some things you can try:
+
+<ul>
+<li>Run your web application by opening the context menu on a resource in the Project Explorer view and selecting Run As > Run On Server.</li>
+<li>Make updates to a resource and see the server pick up the changes on-the-fly.</li>
+<li>Debug your web application by setting a breakpoint in your code and using the Debug As > Debug On Server action.</li>
+<li>Perform actions like Start, Stop, and Open Log Files on the generated server in the Servers view.</li>
+<li>If you run <code>mvn clean</code>, or any other goal from within the workbench that causes the Liberty files to be deleted, the server and its associated runtime will be automatically removed from the workbench. Running <code>mvn install</code> or one of the <code>liberty-maven-plugin</code> goals that re-installs the server will reinstate the server in the Servers view. Note: Maven commands executed from outside of Eclipse will require refreshing the Project Explorer view in order for the workbench to process the changes.</li>
+</ul>
+
+<h3>MicroProfile Config feature</h3>
+
+With the <code>microProfileConfig-0.1</code> feature, you can directly use the Config APIs to retrieve configuration without the need to know where the properties are defined. The properties can be dynamically updated and then retrieved by the applications without the application restarting. The configuration can be located in multiple sources, and has a priority system. If the same property is specified in multiple config sources, the value from the config source with the highest priority will be used. The properties can be overwritten by users in different environments.
+
+<h3>MicroProfile Fault Tolerance feature</h3>
+
+With the <code>microProfileFaultTolerance-0.1</code> feature, you can make the service invocation resilient via retry, fallback, timeout, circuit breaker and bulkhead functionalities. If a service invocation fails, a retry can be performed. After some retries, a fallback operation can be specified. Indefinite waiting is no longer a problem as the timeout can be specified on service invocation. Repeating timeouts are solved by the functionality of the circuit breaker. You will not need to package fault tolerance libraries into your applications any more.
+
+<h2>What’s already in there?</h2>
+
+The February 2017 beta included JPA container 2.1, Transport Security 1.0, an Admin Center update, Logstash Collector and Bluemix Log Collector updates, a Liberty: Audit extension, the isoDateFormat option and a Spnego 1.0 update.
+
+Take a look at the previous beta announcements for a full list of stuff added since the <a href="/wasdev/blog/2016/06/24/websphere-liberty-and-tools-16-0-0-2-release/">16.0.0.2</a> release in June 2016:
+
+<ul>
+<li><a href="/wasdev/blog/2017/02/17/beta-websphere-liberty-tools-february-2017/">February 2017 beta</a></li>
+<li><a href="/wasdev/blog//2017/01/20/beta-websphere-liberty-tools-january-2017/">January 2017 beta</a></li>
+<li><a href="/wasdev/blog/2016/12/16/beta-websphere-liberty-and-tools-december-2016/">December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/11/18/beta-websphere-liberty-and-tools-novemberdecember-2016/">November/December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/10/21/beta-websphere-liberty-and-tools-november-2016/">November 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/09/23/beta-websphere-liberty-and-tools-october-2016/">October 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/08/26/beta-websphere-liberty-and-tools-september-2016/">September 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/07/28/beta-websphere-liberty-and-tools-august-2016/">August 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/30/beta-websphere-liberty-and-tools-july-2016/">July 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/03/beta-websphere-liberty-and-tools-june-2016/">June 2016 beta</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40">
+<a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a>
+</p>

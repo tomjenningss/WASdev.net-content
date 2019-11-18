@@ -1,0 +1,116 @@
+Here's the latest WebSphere Liberty beta and WebSphere Developer Tools (WDT).
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2017/06/13/new-release-websphere-liberty-17-0-0-2/">in June</a>.
+
+Look out for more betas over the coming months.
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<h2>What’s in the WebSphere Liberty beta for July?</h2>
+
+<h3>JSON Binding feature</h3>
+
+The <code>jsonb-1.0</code> feature is one of the first parts of the Java EE 8 feature set and provides a standard mechanism for translating data between raw JSON data and Java objects. By enabling the <code>jsonb-1.0</code> feature, applications may use this technology without needing to provide a third-party library for JSON Binding.
+
+To use JSON Binding in your application, simply enable the <code>jsonb-1.0</code> feature in <code>server.xml</code> and begin using the API directly in your application.  For example, the following data class can be serialized and deserialized from JSON string format:
+
+[code language="java"]
+public class Team {
+    public String name;
+    public int size;
+    public float winLossRatio;
+}
+
+Jsonb jsonb = JsonbProvider.provider().create().build();
+
+// Convert Java Object --> JSON
+Team zombies = new Team();
+zombies.name = "Zombies";
+zombies.size = 9;
+zombies.winLossRatio = 0.8f;
+String teamJson = jsonb.toJson(zombies);
+System.out.println(teamJson);
+
+// Convert JSON --> Java Object
+Team rangers = jsonb.fromJson("{\"name\":\"Rangers\",\"size\":7,\"winLossRatio\":0.6}", Team.class);
+System.out.println(rangers.name);
+[/code]
+
+In addition to providing the simplest possible out-of-the-box experience for JSONB, Liberty also offers a mechanism to customize the JSON-B implementation used by Liberty with a combination of the <code>jsonbBells-1.0</code> feature and corresponding <code>&lt;bell&gt;</code> configuration elements.
+
+Please see <a href="http://json-b.net/">json-b.net</a> for more information.
+
+<h3>JSON Processing 1.1 feature</h3>
+
+The <code>jsonp-1.1</code> feature is one of the first parts of the Java EE 8 feature set and provides enhancements to the JSON Processing 1.0 API to make it consistent with the new JSON Binding API.
+
+<h3>MicroProfile Config feature</h3>
+
+With the <code>mpConfig-1.0</code> feature, you can directly use the Config APIs to retrieve configuration without the need to know where the properties are defined. The properties can be dynamically updated and then retrieved by the applications without the application restarting. The configuration can be located in multiple sources, and has a priority system. If the same property is specified in multiple config sources, the value from the config source with the highest priority will be used. The properties can be overwritten by users in different environments.
+
+<h3>MicroProfile Fault Tolerance feature</h3>
+
+With the <code>mpFaultTolerance-1.0</code> feature, you can make the service invocation resilient via retry, fallback, timeout, circuit breaker and bulkhead functionalities. If a service invocation fails, a retry can be performed. After some retries, a fallback operation can be specified. Indefinite waiting is no longer a problem as the timeout can be specified on service invocation. Repeating timeouts are solved by the functionality of the circuit breaker. You will not need to package fault tolerance libraries into your applications any more.
+
+<h3>OpenAPI v3 feature</h3>
+
+This is a new feature (introduced in the June beta) which is starting to implement the official OpenAPI 3.0 specification.
+
+In the previous beta you could only access the API documentation through the <code>/api/docs</code> endpoint. In the July beta a new endpoint called <code>/ibm/api/docs</code> has been introduced and the behavior of the <code>/api/docs</code> endpoint has been modified.
+
+Using the webModuleDoc element described in the June beta you can declare APIs as public or private. For example:
+[code language="xml"]
+<openapi enablePrivateURL="true">
+  <webModuleDoc contextRoot="/airlines" public="true" />
+  <webModuleDoc contextRoot="/airlinesAdmin" public="false" />
+</openapi>
+[/code]
+
+The APIs that you intend for all to use are called public and are described in the document returned by the <code>/api/docs</code> endpoint. This endpoint is typically available without authentication. In the June beta all APIs were considered public. In the July beta certain APIs may not be documented by this resource as described below.
+
+Other APIs may be for administrative use (e.g. <code>/airlinesAdmin</code>, above) and are considered private. These are not documented in <code>/api/docs</code>. To view these APIs you must use the <code>/ibm/api/docs</code> endpoint which is password protected. This endpoint will document all the private APIs and also all the public APIs.
+
+In this beta, support for JAX-RS annotation scanning has been introduced. If both the <code>jaxrs-2.0</code> and <code>openapi-3.0</code> features are enabled in a server, the annotation scanner will scan all web applications deployed on the server unless the user specifies otherwise through <code>server.xml</code> configurations. The scanner will analyze classes that are annotated with any of the OpenAPI 3.0 annotations as well as classes annotated with the <code>@Path JAX-RS</code> annotation. Generated OpenAPI documents can be accessed through the <code>/api/docs</code> and <code>/ibm/api/docs</code> OpenAPI endpoints. Please note that the annotation support is still under development. Not all of the JAX-RS and OpenAPI annotations are supported at this time.
+
+Both the public endpoint (<code>api/docs</code>) and the private endpoint (<code>ibm/api/docs</code>) now support an optional query parameter called root that can filter the found context roots. For example, a call to <code>GET http://Liberty_host:http_port/api/docs?root=/myApp</code> retrieves an OpenAPI 3.0 document that has only the documentation for the <code>myApp</code> context root.
+
+You can now customize several aspects of the master OpenAPI document such as the info element (title, description, etc) and the <code>externalDocs</code> element. This customization can be done using an OpenAPI snippet that is referenced from the new customization attribute. Here’s an example:
+
+[code language="xml"]
+<openapi customization="${server.config.dir}/custom/customInfo.yaml" />
+[/code]
+
+This snippet document needs to follow the structure of the <code>OpenAPI 3.0.0-rc1</code> specification but it does not need to be complete on its own. For example, you could have a snippet such as:
+
+[code lang="text"]
+openapi: 3.0.0-rc1
+info:
+  title: Checkout APIs
+  description: APIs to checkout from our online store
+  version: 2.1.0
+[/code]
+
+The customization attribute can specify a file (yaml or json) which will be monitored for updates. You can also specify a URL which will need to return an OpenAPI snippet specifying what you want to customize. Here's an example:
+
+[code language="xml"]
+<openapi customization="http://myWebsite.com/myCustomOpenAPI" />
+[/code]
+
+<h2>What’s already in there?</h2>
+
+The June Liberty beta included the OpenAPI v3 feature and the JSON-B v1.0 feature.
+
+Take a look at the previous beta announcements for a full list of stuff added since the <a href="/wasdev/blog/2017/06/13/new-release-websphere-liberty-17-0-0-2/">17.0.0.2</a> release in June 2017:
+
+<ul>
+<li><a href="/wasdev/blog/2017/06/13/beta-websphere-liberty-tools-june-2017/">June 2017 beta</a></li>
+</ul>
+
+<h2>Looking for the latest?</h2>
+
+If you're visiting this post from the future and you're looking for the latest releases of Liberty, here are the links you're looking for:
+
+<a href="https://developer.ibm.com/wasdev/docs/new-in-latest-earlyaccess">Latest beta release</a>
+<a href="https://developer.ibm.com/wasdev/docs/new-latest-ga-download">Latest stable release</a>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

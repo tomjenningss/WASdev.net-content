@@ -1,0 +1,73 @@
+We’ve made significant updates to the <a href="/wasdev/downloads/liberty-profile-using-eclipse/">17.0.0.2 version of WDT</a> for use with the v2.0 Liberty Maven plugin to improve your experience when working with Liberty servers managed by Maven WAR projects. When your Maven web application project installs a Liberty server, the Eclipse tools can automatically recognize and add the server and runtime to the workbench for easier server interactions.
+
+<h2>Trying it out</h2>
+
+<ol>
+<li>Clone the Git repository containing a sample Liberty Maven WAR project available at <a href="https://github.com/WASdev/sample.ferret.git">https://github.com/WASdev/sample.ferret.git</a> to your local filesystem.</li>
+<li>Use the <strong>File > Import > Maven > Existing Maven Projects</strong> option to import the project.</li>
+</ol>
+
+When you import or open a Liberty Maven WAR project in WDT, or if you update a Maven project in WDT to use <code>liberty-maven-plugin</code> v2.0 or later (edit the <code>pom.xml</code> then click <strong>Maven > Update project...</strong>), WDT displays the following prompt:
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/WDTPrompt.jpg"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/WDTPrompt.jpg" alt="" width="694" height="278" class="alignnone size-full wp-image-22689 screenshot" /></a>
+
+This prompt indicates that WDT recognizes your project as a Maven WAR project and prompts you to decide whether to let it add the server and runtime to your Eclipse workspace.
+
+After selecting <strong>Yes</strong>, you can have all aspects of your application development at your fingertips:
+
+<a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/WDT_in_eclipse_screenshot_updateJuly192017-1200px.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/06/WDT_in_eclipse_screenshot_updateJuly192017-1200px.png" alt="" width="1200" height="718" class="alignnone size-full wp-image-23216 screenshot" /></a>
+
+There's a lot going on here.  The workbench is configurable but mine shows:
+
+<ol>
+<li>The sample project and the Liberty runtime installed in the target folder of the project.</li>
+<li>The project POM using the latest Liberty Maven plugin (liberty-maven-plugin).</li>
+<li>Easy interaction with Git.</li>
+<li>The Servers view where WDT automatically added this server. I started the server from this view. It also shows the Liberty server's configuration files and distinguishes between the files in the <code>src</code> and <code>target</code> directories.</li>
+<li>The Runtime Explorer view with the Liberty runtime added.</li>
+<li>The console showing the running server and application.</li>
+</ol>
+
+<h4>No prompt after import?</h4>
+
+Some Eclipse configurations can run into problems connecting to the Maven Central Repository. If your project has Maven Problems in the Markers view that indicate problems transferring artifacts to/from repositories, you can resolve them by using Maven from the command line for actions that require communication with remote repositories:
+
+<ol>
+<li>Right-click the project and go to <strong>Properties > Project Facets</strong> (click the link to convert to a faceted project if it appears) and make sure that <strong>Dynamic Web Module</strong> is selected.</li>
+<li>Run <code>mvn install</code> on the command line from within the directory containing your project's <code>pom.xml</code> file.</li>
+<li>Rebuild your project in the Eclipse workbench using the <strong>Project > Clean...</strong> action</li>
+<li>Right-click the project within the workbench and click <strong>Refresh</strong>.</li>
+</ol>
+
+<h3>Running the <strong>Maven clean</strong> goal</h3>
+
+If you run the <strong>Maven clean</strong> goal, WDT removes the server from view. As as soon as you build the project again, it's back.
+
+Using <strong>Maven clean</strong> on your project removes your project's <code>target</code> files, including the Liberty installation files so the server is removed. Running a <strong>Maven install</strong> reinstates the server automatically. Closing the Maven project also removes the server. Re-opening the project causes the prompt to appear again and you can select whether or not you want WDT to continue managing your server automatically.
+
+<h2>Configuring your Liberty server</h2>
+
+Use the <a href="https://github.com/WASdev/ci.maven/blob/master/docs/common-server-parameters.md#common-server-parameters">Liberty Maven plugin configuration parameters</a> to configure the Liberty server.
+
+For the best development experience, use the Liberty Maven plugin (<code>liberty-maven-plugin</code>) with the <code>looseApplication</code> parameter set to <code>true</code>. This tells the Liberty server to use the application resources from your workspace so that changes to your application are reflected almost instantaneously. The sample used in the screenshot above uses the <a href="https://github.com/WASdev/ci.maven/blob/master/liberty-maven-app-parent/pom.xml"><code>liberty-maven-app-parent</code> <code>pom.xml</code></a>, which enables the <code>looseApplication</code> parameter by default. If <code>looseApplication</code> is set to <code>false</code>, the application needs to be repackaged so updates take longer to process.
+
+Set <code>looseApplication</code> and other configuration parameters in the <code>liberty-maven-plugin</code> configuration, which is located in the project's <code>pom.xml</code> file. After updating the <code>pom.xml</code> file right-click the project, then click <strong>Maven > Update project</strong> to update the server and runtime instances within the Eclipse workbench.
+
+You can further configure the Liberty server by modifying the server configuration file. Open the Servers view and double-click the <strong>Server Configuration</strong> node to open the Server Configuration editor. Make changes and save the file to automatically update the server.
+
+<h2>Exploring other options with your Maven WAR project</h2>
+
+Here are some common things that you can now do with your Maven WAR projects in WDT:
+
+<ul>
+<li>Perform actions like <strong>Start</strong>, <strong>Stop</strong>, and <strong>Open Log Files</strong> on the generated server in the Servers view.</li>
+<li>Run your web application by right-clicking a resource in the Project Explorer view and selecting <strong>Run As > Run On Server</strong>.</li>
+<li>Debug your web application by setting a breakpoint in your code and using the <strong>Debug As > Debug On Server</strong> action.</li>
+<li>Update your application code or resource and see the server pick up the changes on-the-fly.</li>
+<li>Use the Servers view to see a clear representation of the server configuration files within your Maven project. The files listed under the <code>Maven Target</code> folder are derived from your Maven project’s <code>target</code> folder. These files are intended for read-only consumption. Use the files listed directly under the server that correspond to the files in your Maven project’s <code>src</code> folder to update your server’s configuration. They are copied to the target.</li>
+<li>Make changes to your <code>liberty-maven-plugin</code> configuration in your Maven project’s <code>pom.xml</code> and use the <strong>Maven > Update project…</strong> menu option to update the server and runtime instances within the Eclipse workbench.</li>
+</ul>
+
+<h2>Give it a go!</h2>
+
+You can iteratively develop and debug your web application within Eclipse and then build and package your application using Maven. The end result is a cohesive Maven development experience.

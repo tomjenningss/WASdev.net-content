@@ -1,0 +1,104 @@
+The <code>monitor-1.0</code> feature in WebSphere Liberty provides performance metrics such as database connection pool size, servlet response time, JVM garbage collection time, and so on. You can use this to understand how your Java application performs on a Liberty server, and administrators can monitor and tune the performance of your application in production.
+
+<h2>Some background</h2>
+
+Traditional WebSphere Application Server (WAS) has long provided a number of performance indicators, or counters, or metrics, as part of the Performance Monitoring Infrastructure (PMI).  For example, PMI provides metrics for database connection pool size, servlet response time, Enterprise JavaBeans (EJB) method response time, Java virtual machine (JVM) garbage collection time, CPU usage, and others. This data can be used to understand the runtime resource utilization patterns of the thread pool, connection pool, and so on, and the performance characteristics of the application components like servlets, JavaServer Pages (JSP), and enterprise beans.  These metrics and counters can be used to monitor the health of the application server and to tune the performance of applications.  Typically, tools gather the values of the desired counters and display those values in some sort of a user interface.  For traditional WAS, most tools gather these metrics through JMX MBeans.
+
+Because of the usefulness of these metrics, Liberty provides similar performance monitoring metrics as part of the <code>monitor-1.0</code> feature.  To find out more about monitoring Liberty servers in general, see the <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.core.doc/ae/twlp_mon.html">Knowledge Center docs</a>.
+
+Like traditional WAS, Liberty users can either use tools to visualize these metrics, or directly obtain the metrics themselves by invoking the appropriate MBean through JMX. To find out more, see the <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.core.doc/ae/twlp_admin_jmx.html">Knowledge Center docs</a>.  Unlike traditional WAS, Liberty also allows users (and tools) to obtain these metrics using RESTful interfaces as described in a <a href="/wasdev/docs/accessing-libertys-jmx-rest-apis/">Accessing Liberty’s JMX REST APIs</a>.
+
+<h2>Why bring this up now?</h2>
+
+The set of metrics provided by Liberty is similar to, but not exactly the same as, the set provided by traditional WAS.  The <code>monitor-1.0</code> feature has been around for a while but, as part of the 17.0.0.2 Liberty release, we addressed a Request For Enhancement (RFE) <a href="http://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&CR_ID=96544">asking us to provide an additional metric for the <code>ConnectionPoolStats</code> MBean in Liberty that was in traditional WAS</a>.  We do listen to your requests and try to address some of them with each release.
+
+As part of that work, I wanted to take the opportunity to explain how you might start taking advantage of monitoring for Liberty.  I’ll use the new Liberty metric, <code>InUseTime</code>, as an example.  This metric is one of a set of metrics of the <code>ConnectionPoolStats</code> MBean related to JDBC and JCA connection pooling. To find out more about monitoring of Liberty connection pools, see the <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.core.doc/ae/rwlp_mon_connectionpools.html">Knowledge Center docs</a>.
+
+<h2>What’s new?</h2>
+
+Traditional WAS provides a JDBC connection pool counter named <code>UseTime</code>, which is the average time in milliseconds that a JDBC connection is in use.  As part of our on-going effort to ease migration between the two application servers, and in response to the RFE I mentioned earlier, we've added a similar counter named <code>InUseTime</code> to the set of Liberty monitoring metrics.
+
+The name was changed in Liberty to better reflect the usage of the counter.  The <code>InUseTime</code> and <code>UseTime</code> metrics are useful in understanding how quickly (or slowly) database connections are being obtained, used, and returned to the connection pool.  Typically, a lower number is better and indicates that applications shouldn’t have to wait very long to obtain a connection from the connection pool.  Using this new metric in conjunction with the other metrics gives a more complete view of the overall health of database connections of the app server.
+
+So, how to access this info?  First, you’ll need to add the <code>restConnector-2.0</code> and <code>monitor-1.0</code> features to your Liberty <code>server.xml</code>.  If the monitor feature is not installed on your app server, you can install it by using the command <code>bin/installUtility install monitor-1.0</code> from your Liberty runtime directory.  You’ll also need some sort of application that accesses a database and thus creates a connection pool for the associated data source.  This is necessary because connection pools are lazy by nature and are only created when needed. Once you’ve enabled the features listed above and an application is running, you can access the REST interface to the JDBC/JCA connection pool MBean.  For simplicity, I’m going to use a browser to access the REST interfaces. You can do the same or you can use any other REST client.
+
+<h2>wRESTing Metrics from the Connection Pool</h2>
+
+First, let’s find the URL for the connection pool MBean by listing all of the registered MBeans using this URL:
+<code>https://localhost:9443/IBMJMXConnectorREST/mbeans</code>
+
+The response is a JSON object that lists all registered MBeans and, if we search that list for <code>ConnectionPoolStats</code> (the object name of the MBean), we’ll find a JSON object like this:
+
+<pre>{"objectName":"WebSphere:type=ConnectionPoolStats,name=jdbc/DictionaryDB","className":"com.ibm.ws.connectionpool.monitor.ConnectionPoolStats","URL":"/IBMJMXConnectorREST/mbeans/WebSphere%3Aname%3Djdbc%2FDictionaryDB%2Ctype%3DConnectionPoolStats"}</pre>
+
+If you’re running multiple JDBC applications that access multiple data sources, your JSON response to the query contains multiple objects, one per connection pool or data source.  If so, simply search those results for the JNDI name of your datasource.  For this example, my application uses a data source with a JNDI name of <code>jdbc/DictionaryDB</code>.  The JSON object for your connection pool lists the URL of the REST interface for the connection pool metrics, <code>ConnectionPoolStats</code>. In my example, the URL is <code>https://localhost:9443/IBMJMXConnectorREST/mbeans/WebSphere%3Aname%3Djdbc%2FDictionaryDB%2Ctype%3DConnectionPoolStats</code>
+
+The JSON response from that URL gives us a list of fetchable attributes and, since we’re talking about <code>InUseTime</code>, let's grab that one from the URL attribute: <code>URL:/IBMJMXConnectorREST/mbeans/WebSphere%3Aname%3Djdbc%2FDictionaryDB%2Ctype%3DConnectionPoolStats/attributes/InUseTime</code>
+
+Visiting that URL yields a JSON response that looks something like this:
+
+<pre>{"value":"355.0","type":"java.lang.Double"}</pre>
+
+So, for my sample application, connections from the pool were in use for 355 milliseconds.  Of course, although it’s useful to test drive the REST API from the browser, it’s likely more useful to either use one of the many tools to obtain the metrics, or write a client that can access the REST interfaces and understand the JSON responses.
+
+<h2>Apples and oranges</h2>
+
+As I mentioned earlier, traditional WAS and Liberty share some of the same metrics.  Some of them have the same name; some are slightly different.  The table below compares the set of <code>ConnectionPoolStats</code> MXBean metrics to that of traditional.  To make things easier, for those that are common, even if the name is slightly different, the interpretation of the contents is the same.  There are additional metrics in traditional WAS that are not present in Liberty but, in some cases, the metric can calculated from other existing metrics.  For example, traditional WAS has a metric, <code>PoolSize</code>, that is not in Liberty but a Liberty user can calculate the value through simple subtraction:
+
+pool size = ManagedConnectionCount – FreeConnectionCount
+
+<table>
+<caption>Comparison of ConnectionPoolStats MXBean metrics</caption>
+    <thead>
+        <tr>
+            <th>Traditional WAS metric name</th>
+            <th>Liberty metric name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>CreateCount</td>
+            <td>CreateCount</td>
+            <td>The total number of managed connections that have been created since pool creation. </td>
+        </tr>
+        <tr>
+            <td>CloseCount</td>
+            <td>DestroyCount</td>
+            <td>The total number of managed connections that have been destroyed since pool creation.</td>
+        </tr>
+        <tr>
+            <td>ManagedConnectionCount</td>
+            <td>ManagedConnectionCount</td>
+            <td>The total number of managed connections in the free, shared, and unshared pools.</td>
+        </tr>
+        <tr>
+            <td>WaitTime</td>
+            <td>WaitTime</td>
+            <td>The average waiting time in milliseconds until a connection is granted if a connection is not currently available.</td>
+        </tr>
+        <tr>
+            <td>ConnectionHandleCount</td>
+            <td>ConnectionHandleCount</td>
+            <td>The number of connections that are in use. This number might include multiple connections that are shared from a single managed connection.</td>
+        </tr>
+        <tr>
+            <td>FreePoolSize</td>
+            <td>FreeConnectionCount</td>
+            <td>The number of managed connections in the free pool.</td>
+        </tr>
+        <tr>
+            <td>UseTime</td>
+            <td>InUseTime</td>
+            <td>The average time in milliseconds that a connection is in use.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Summary</h2>
+
+Using the newly added <code>InUseTime</code> metric of the <code>ConnectionPoolStats</code> MXBean as an example, we’ve looked at how to retrieve metrics from the Liberty server using the REST interface.  We’ve also compared the available set of metrics between traditional WAS and Liberty app servers and discussed some of the differences.  Hopefully this information will useful in helping you better understand Liberty connection pooling metrics.
+
+<h3>Related articles</h3>
+
+[pn-getposts type="any" include="14790,20020,13018" hideimage="true" cols=3 rows=1 feature="pn-brick"][/pn-getposts]

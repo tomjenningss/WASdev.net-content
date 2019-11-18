@@ -1,0 +1,16 @@
+We are planning to move a part of the WebSphere Liberty Repository to a new server on the 29th of November.
+
+Most users shouldn’t notice the change because tools that access the repository will start using the new server automatically. However, if you have a firewall that restricts outgoing connections using an IP address whitelist, you’ll need to allow traffic to the new server IP addresses. If you do need to update your firewall settings, the new server IP addresses are <code>169.60.37.170</code> and <code>169.60.37.171</code>.
+
+<h2>Background to the Liberty Repository</h2>
+
+Whenever you install new features or samples into a Liberty runtime, those files are usually fetched from a repository. Although you can install from a file-based repository or set up a local repository server, by default the files are fetched from the WebSphere Liberty Repository. The <code>installUtility</code> and <code>featureManager</code> CLI tools, Installation Manager, and Websphere Development Tools for Eclipse can all install features from the repository. The <a href="/wasdev/downloads/">Downloads section of WASdev.net</a> also gets the data for each available download from the WebSphere Liberty Repository.
+
+The WebSphere Liberty Repository consists of two parts (neither of these services are easily accessible with a web browser):
+
+<ul>
+<li>The <em>asset service</em>, a REST service which stores metadata about the available files. This is hosted on <code>asset-websphere.ibm.com</code></li>
+<li>The <em>file store</em>, which serves the actual files. This is hosted on <code>public.dhe.ibm.com</code></li>
+</ul>
+
+We’re moving the asset service component to a new server with a new IP address. We’ll update the DNS entry for <code>asset-websphere.ibm.com</code> so that the programs you’re using can find the new server. For most users, this shouldn’t cause a problem. It’s only if you’re using an firewall that restricts outbound connections by IP that you must allow access to the new IP addresses to continue using the repository.

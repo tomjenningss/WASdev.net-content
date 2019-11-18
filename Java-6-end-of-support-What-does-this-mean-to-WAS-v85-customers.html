@@ -1,0 +1,19 @@
+The end of Java 6 support is coming!
+
+Oracle has announced <a href="http://www.oracle.com/technetwork/java/eol-135779.html">Extended Support for Java 6 will end December 2018</a>. What does this mean for your WebSphere installation?
+
+<h2>Summary</h2>
+
+On April 30, 2018, WAS 8.5.x will no longer support Java 6 as its runtime. WAS 8.5.5.13 will be the last fix pack to support Java 6 and, starting with WAS 8.5.5.14, the embedded Java 6 will be removed and replaced with Java 8.
+
+<h2>Details of Java 6 end of support</h2>
+
+WAS v8.5 supports pluggable JDK which means you can use WAS v8.5 with Java 6, 7, or 8. With the Java 6 end of support (EoS) coming, IBM strongly encourages customers to move to Java 7 or 8. Migration to a newer version of Java will help customers move away from aging crypto technologies and avoid the risks of non-addressed future security exposures. Also, with the pluggable JDK support of WAS v8.5, switching JDKs is fairly easy.
+
+For customers on WAS 8.5.x, IBM announced that <a href="https://www.ibm.com/developerworks/community/blogs/aimsupport/entry/End_of_Support_for_WebSphere_v7_v8_and_Java_6_in_WebSphere_v8_5_April_2018?lang=en">Java 6 will no longer be a supported WebSphere runtime after April 30, 2018</a>. WAS 8.5.5.13, currently scheduled for February 2018, will be <a href="https://www-01.ibm.com/support/docview.wss?uid=swg27009661">the last fix pack to support Java 6</a>. Starting in WAS 8.5.5.14, the embedded installation of Java 6 will be removed and replaced with Java 8. If you wish to remove Java 6 before 8.5.5.14, you will need to perform a new installation of WebSphere. Otherwise, Java  6 will be removed with an in-place upgrade with fix pack 8.5.5.14.
+
+After April 30, 2018, fixes to the Java 6 runtime will be limited. Customers will be able to get security fixes from IBM, which include the <a href="https://www.oracle.com/technetwork/topics/security/alerts-086861.html">Oracle Critical Patch Updates (CPUs)</a> for Java 6, until December 2018. Only CPU fixes will be available after April 30, 2018.
+
+For Liberty users: Liberty ceased support of Java 6 in version 17.0.0.3. To use the latest version of Liberty you must upgrade to Java 7 or Java 8.
+
+<em>Updated 2018-03-14: After April 30, 2018, security fixes for the IBM SDKs will be available from IBM, not Oracle as previously implied.</em>

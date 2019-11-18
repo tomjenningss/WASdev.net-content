@@ -1,0 +1,114 @@
+Document the RESTful APIs in your Java apps with OpenAPI 3.1 in the April 2018 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>. Also try out single sign-on with JWT and custom X.509 certificate mapping to users.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Check out the <a href="/wasdev/blog/2018/03/16/microprofile-1-3-liberty-18001/">18.0.0.1 release of WebSphere Liberty</a> which is built on the <a href="https://openliberty.io/news/2018/03/16/distributed-tracing-microservices-18001.html">18.0.0.1 release of Open Liberty</a>. Look out for more betas over the coming months. If you just can't wait, take a look at the <a href="https://openliberty.io/downloads/">daily builds of Open Liberty</a>.
+
+Follow Open Liberty happenings on <a href="https://twitter.com/openlibertyio">@OpenLibertyIO</a>.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#mpopen">Document the RESTful APIs in your Java apps with OpenAPI 3.1</a></li>
+<li><a href="#jwtsso">Single sign-on (SSO) with JSON web tokens (JWT)</a></li>
+<li><a href="#certmapping">Custom X.509 certificate mapping to users</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<div id="mpopen" />
+
+<h2>Document the RESTful APIs in your Java apps with OpenAPI 3.1</h2>
+
+The <code>openapi-3.1</code> feature is an extension of the MicroProfile OpenAPI (<code>mpOpenAPI-1.0</code>) feature. In addition to providing support for the <a href="https://github.com/eclipse/microprofile-open-api">MicroProfile OpenAPI 1.0 specification</a>, the Open API 3.1 feature provides an aggregated view of APIs from multiple applications deployed in the server.
+
+Simply add the <code>openapi-3.1</code> feature to your <code>server.xml</code> and use one of the <a href="https://github.com/eclipse/microprofile-open-api/blob/master/spec/src/main/asciidoc/microprofile-openapi-spec.adoc#documentation-mechanisms">documentation methods listed in the specification</a> for each of your applications:
+
+[code lang="xml"]
+<featureManager>
+   <feature>openapi-3.1</feature>
+</featureManager>
+[/code]
+
+You can view the generated aggregated OpenAPI document in the endpoint <code>/api/docs</code>, or view the rendered user interface at the endpoint <code>/api/explorer</code>.
+
+<div id="jwtsso" />
+
+<h2>Single sign-on (SSO) with JSON web tokens (JWT)</h2>
+
+The new JWT SSO feature uses the industry standard JWT as a single sign-on tracking cookie.  This is an alternative to the IBM proprietary LTPA cookie with several advantages:
+
+<ul>
+<li>The JWT cookie can carry enough information that the overhead of contacting a back-end registry (LDAP) for authentication can be avoided.</li>
+<li>Other components, such as reverse proxies and app servers, can produce and consume these cookies which simplifies inter-operation and avoids the need to create custom authentication mechanisms. </li>
+</ul>
+
+To enable the JWT SSO feature, add the feature to the <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+   <feature>jwtSso-1.0</feature>
+</featureManager>
+[/code]
+
+For more info, see the <a href="https://www.ibm.com/support/knowledgecenter/was_beta/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_sec_config_jwt_sso.html">WebSphere Liberty Knowledge Center docs</a>.
+
+<div id="certmapping" />
+
+<h2>Custom X.509 certificate mapping to users</h2>
+
+Liberty's LDAP and basic user registries now support custom X.509 certificate mapping. This allows complete control over how certificates are mapped to users in the user registry.
+
+The out-of-the-box X.509 certificate mappers for the LDAP user registry did not handle custom Universal Object Identifiers (OIDs) or parsing of certificate fields, and they included custom filtering of only a subset of the certificate's fields. For example, there was no support for subject alternative name (SAN). The out-of-the-box X.509 certificate mapper for the basic user registry only supported using the subject's <code>cn</code> relative distinguished name (RDN) for the user name.
+
+The CertificateMapper API now enables mapping an X.509 certificate to a user in the user registry in any way that is required.
+
+To use the CertificateMapper API, implement the <code>com.ibm.websphere.security.CertificateMapper</code> interface and include it in a JAR. Also include in the JAR a Java ServiceLoader provider-configuration file (<code>META-INF/com.ibm.websphere.security.CertificateMapper</code>) that contains the fully-qualified class names of any CertificateMapper implementations that you want to use in the Liberty server.
+
+These implementations can then be loaded into Liberty's classpath using the <code>bells-1.0</code> feature with a shared library. Basic and LDAP user registries can then reference your implementation. Here is an example <code>server.xml</code> configuration for configuring two separate CertificateMapper implementations to a basic and LDAP user registry:
+
+[code lang="xml"]
+      <server>
+            <featureManager>
+                <feature>basicRegistry-1.0</feature>
+                <feature>ldapRegistry-3.0</feature>
+                <feature>bells-1.0</feature>
+            </featureManager>
+
+            <!--
+                    The library contains any CertificateMapper implementations.
+             -->
+            <library id="mylibrary">
+                <file name="${shared.resource.dir}/libs/myLibrary.jar" />
+            </library>
+
+            <!--
+                    Bundle the library using the BELLS feature.
+             -->
+            <bell libraryRef="mylibrary" />
+
+            <!--
+                    Reference the CertificateMapper(s) from the user registries by configuring the
+                    certificateMapMode attribute to "CUSTOM" and referencing the ID returned from
+                    the CertificateMapper implementation's getId() method in the certificateMapperId
+                    attribute.
+             -->
+            <basicRegistry ... certificateMapMode="CUSTOM" certificateMapperId="basicMapper" />
+            <ldapRegistry ... certificateMapMode="CUSTOM" certificateMapperId="ldapMapper" />
+        </server>
+[/code]
+
+For more info, see the WebSphere Liberty Knowledge Center docs on <a href="https://www.ibm.com/support/knowledgecenter/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_sec_basic_certmap.html">Basic registry mapping</a> and <a href="https://www.ibm.com/support/knowledgecenter/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_sec_ldap_certmap.html">LDAP registry mapping</a>.
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2018/03/16/single-logout-march-liberty-beta/">March Liberty beta</a> included single logout function with single sign-on, and HTTP sesssion persistence backed by JCache.
+
+MicroProfile 1.3 is now fully-supported in <a href="/wasdev/blog/2018/03/16/microprofile-1-3-liberty-18001/">WebSphere Liberty 18.0.0.1</a>.
+
+<h2>Looking for the latest?</h2>
+
+If you're visiting this post from the future and you're looking for the latest releases of Liberty, here are the links you're looking for:
+
+<a href="https://developer.ibm.com/wasdev/docs/new-in-latest-earlyaccess">Latest beta release</a>
+<a href="https://developer.ibm.com/wasdev/docs/new-latest-ga-download">Latest stable release</a>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

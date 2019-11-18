@@ -1,0 +1,54 @@
+With the release of the Liberty December beta comes a new way to control server endpoints. A server endpoint is a connection point for inbound traffic like HTTP, JMS messaging and IIOP. There are situations where it’s useful for a server administrator to pause inbound traffic and then later resume it. In Liberty version 17.0.0.1, we added options to the <code>server</code> command that allow the pause and resume of HTTP endpoints (for more details, see the <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_PauseResume_cmd.html">Knowledge Center docs</a>). While it’s useful to be able to do this using the <code>server</code> command, some operational environments use Java Management Extension (JMX) to control and administer servers and the command line version of pause and resume may not fit those needs. Because we’re good listeners, in response to several Request for Enhancements (RFE), we’re working on making this function available via JMX MBeans. The December beta is a stepping stone to fulfilling those RFEs.
+
+The beta endpoint control feature, <code>endpointControl-1.0</code>, provides Liberty administrators a new MBean that has  function similar to the command line counterparts, but may be more useful in an operational context because it can be invoked via JMX. Like the command line counterparts, the MBean is currently limited to controlling HTTP endpoints. However, because we designed the pause and resume capability as a generic mechanism for controlling server endpoints, it gives us the flexibility to add other endpoint types in the future. Keep watching the Liberty betas for the ability to control additional endpoint types.
+
+<h2>Enabling the MBean</h2>
+
+How does this all work? Let’s start with enabling the beta feature. Because this is beta function and subject to change based on the feedback we receive, accessing it requires adding the <code>&lt;endpointControl&gt;</code> feature to the feature manager list of your <code>server.xml</code>. When this function becomes generally available, the need to add this feature to your server configuration will go away.  While I’m editing the server config, because I want to access the MBean via JMX, I’m going to enable the local connector feature also:
+
+[code lang="xml"]
+<featureManager>
+    <feature>endpointControl-1.0</feature>
+    <feature>localConnector-1.0</feature>
+<featureManager/>
+[/code]
+
+You could use the REST connector feature or local JDK bridge instead (for more details, see the <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_admin_jmx.html">Knowledge Center docs</a>).
+
+Once you’ve added those features to your <code>server.xml</code> and the server is up and running, you can connect using any JMX tool like jconsole (for more details, see the <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_admin_jmx.html">Knowledge Center docs</a>). Once connected, you’ll need to navigate to the proper MBean, we’re looking for one with the ObjectName <code>WebSphere:feature=kernel,name=ServerEndpointControl</code>
+
+<h2>Listing available endpoints</h2>
+
+Once you find it, have a look at the operations it supports. One MBean operation that is not available in the <code>server</code> command counterpart is the method <code>List listEndpoints()</code>; this returns the name of all endpoints that can be paused/resumed.
+
+On my server configured with just the above two features, that operation returns <code>[]</code> (an empty list) because no endpoints are yet activated. And attempting to access the default HTTP endpoint at <code>localhost:9080</code> results in a 404. But, if I add a feature that causes the default instance of HTTP endpoint to be activated, say <code>&lt;feature&gt;servlet-3.1&lt;/feature&gt;</code> (or any feature that depends on it), when I again execute the <code>listEndpoints()</code> operation, it now returns <code>[defaultHttpEndpoint]</code>. I can also verify the endpoint is started by visiting <code>localhost:9080</code> and noting that I get the server welcome page. If I add another HTTP endpoint to my <code>server.xml</code> and save it (e.g. <code>&lt;httpEndpoint httpPort=9090 /&gt;</code>, choose wisely and avoid port conflicts), and issue the <code>listEndpoints()</code> operation again, I’ll see something like <code>[defaultHttpEndpoint, httpEndpoint-172]</code>. Since I didn’t define an <code>id</code> attribute for the <code>httpEndpoint</code> element I added, Liberty created one for it. You can go back and add an ID to the element and after saving your config, re-run the <code>listEndpoints()</code> operation and note the update.
+
+<h2>Controlling the state of endpoints</h2>
+
+Now that we’ve got a couple of endpoints, let’s look at the pause and resume operations of the MBean. These methods use syntax similar to the <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_PauseResume_cmd.html"><code>server</code> command counterparts</a>. There are operations to pause and resume all endpoints:
+
+<code>void pause()</code> - Pauses all registered server endpoints
+<code>void resume()</code> - Resumes all registered server endpoints
+
+If I issue the pause operation, both endpoints listed above will be paused and visiting <code>localhost:9080</code> result` in a 404. A scenario where these two operations can be useful is if you have an HTTP appliance (such as a firewall or load balancer) sitting in front of your Liberty server and you need to adjust some parameters of it. By pausing all inbound HTTP traffic while you make changes and then resuming it, you’ll ensure a smooth transition. If instead I want to pause or resume a specific set of endpoints, I can use the targeted versions of the operations:
+
+<code>void pause(String targets)</code> - Pauses the server endpoints specified by <em>targets</em>
+<code>void resume(String targets)</code> - Resumes the server endpoints specified by <em>targets</em>
+
+where <em>targets</em> is a list of one or more endpoint names as returned by the <code>listEndpoints()</code> operation, separated by commas.
+
+<h2>Query the state of endpoints</h2>
+
+In addition to the ability to list, pause and resume endpoints, the mbean has operations allowing you to query the current state of all or some of the server endpoints:
+
+<code>boolean isPaused()</code> - Query the state of all registered server endpoints. Returns true if the cumulative state of all registered endpoints is paused, otherwise false.
+
+Or if I want to know the state of specific endpoints, again I can use the targeted operation:
+
+<code>public boolean isPaused(String targets)</code> - Query the state of the specified server endpoints. If a single target is specified, returns the state of the specified target, if multiple targets are specified, returns true only all specified targets are paused.
+
+<h2>Feedback</h2>
+
+Hopefully this overview of the new endpoint control MBean in the December 2017 Liberty beta will motivate you to install the beta, play around with the new function and give us more feedback.
+
+<a href="/wasdev/blog/2018/03/16/endpoints-liberty-mbeans-part2/">Read Part 2 now</a>

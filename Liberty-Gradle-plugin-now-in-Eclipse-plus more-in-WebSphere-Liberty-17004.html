@@ -1,0 +1,115 @@
+WebSphere Liberty 17.0.0.4 is now available to download. The WebSphere Developer Tools 17.0.0.4 now integrate with the Liberty Gradle plugin so you can import your Liberty Gradle projects into Eclipse. Built on <a href="https://github.com/OpenLiberty">Open Liberty</a>, this release of WebSphere Liberty also includes Concurrency updates, JSF Container 2.2 updates, OpenAPI 3.0 updates, and more.
+
+If you want to learn more about WebSphere Liberty 17.0.0.4 or ask questions about it, join one of our free webcasts on <a href="/wasdev/events/find-whats-new-websphere-liberty-v17-0-0-4/">17 January</a> and <a href="/wasdev/events/find-whats-new-websphere-liberty-v17-0-0-4-2/">24 January</a>.
+
+<p class="ibm-btn-row pn-p40" style="clear:left">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download WebSphere Liberty 17.0.0.4"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download WebSphere Liberty 17.0.0.4</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+What's new in WebSphere Liberty 17.0.0.4?
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/10/OL_logomark_132_wht.png" alt="" width="262" height="191" class="alignleft size-full wp-image-23746" /></a>
+
+Everything in <a href="https://openliberty.io/news/2017/12/21/jsf-implementation-open-liberty-17004.html">Open Liberty 17.0.0.4</a> is available in WebSphere Liberty 17.0.0.4:
+
+<ul>
+<li>JSF Container 2.2 (bring your own JSF implementation)</li>
+<li>Concurrency updates</li>
+<li>Open tracing (opentracing.io implementation)</li>
+</ul>
+
+<p style="clear:left"></p>
+
+In addition, WebSphere Liberty includes the following new features and updates:
+
+<ul>
+<li>Request for enhancements (RFEs) <em>(Added 2018-01-18)</em></li>
+<li><a href="#gradle">Gradle integration with WebSphere Developer Tools</a></li>
+<li><a href="#openapi3">OpenAPI 3.0</a></li>
+<li><a href="#sociallogin">Social login</a></li>
+<li><a href="#logstash">Throttle events in Logstash log collector</a></li>
+</ul>
+
+<h2>Request for enhancements (RFEs)</h2>
+
+In this release, the following RFEs were completed:
+
+<ul>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&amp;CR_ID=75186">75186: 3rd party JSF Implementation usage with CDI on WebSphere Liberty Profile</a></li>
+<li><a href="https://www.ibm.com/developerworks/rfe/execute?use_case=viewChangeRequest&amp;CR_ID=90862">90862: Managed executors (concurrent-1.0 feature) should be able to limit maximum concurrency and how many requests can queue up</a></li>
+</ul>
+
+<div id="gradle" />
+
+<h2>Gradle integration with WebSphere Developer Tools (WDT)</h2>
+
+Import web application Gradle projects into WDT for developing in Eclipse.  You can now take advantage of WDT features from your Gradle projects, including running applications directly from the workspace, incremental publishing, and using the server configuration editor while maintaining the Gradle structure of your project.
+
+For fully integrated Gradle development of web applications within WDT:
+
+<ol>
+<li>Set up your Gradle project to use the Liberty Gradle plugin (see <a href="https://github.com/WASdev/ci.gradle">the Liberty Gradle plugin docs</a>, or have a look at one of the samples: <a href="https://github.com/WASdev/sample.servlet">Servlet sample</a>, <a href="https://github.com/WASdev/sample.jpa">JPA sample</a>, <a href="https://github.com/WASdev/sample.javaee7.jta">JTA sample</a>).</li>
+<li>Import your project as an existing Gradle project into WDT: <strong>File > Import > Gradle > Existing Gradle Project</strong></li>
+<li>When prompted to create a server, click <strong>Yes</strong>:
+<img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/12/createServer.png" alt="" width="686" height="264" class="aligncenter size-full wp-image-2409" /></li>
+<li>Start working on your application.</li>
+</ol>
+
+When you make changes to your application or server configuration WDT automatically runs the Gradle tasks needed to publish your changes.
+
+Find out more in <a href="https://www.ibm.com/support/knowledgecenter/en/SSHR6W/com.ibm.websphere.wdt.doc/topics/gradledev.htm">the Knowledge Center documentation</a>.
+
+The open source Liberty Gradle plugin is used with the Gradle WAR plugin to install project WAR files and loose applications to a Liberty Server. For more details, see <a href="https://github.com/WASdev/ci.gradle/blob/master/README.md">the Liberty Gradle plugin documentation</a> in GitHub.
+
+<div id="openapi3" />
+
+<h2>OpenAPI 3.0</h2>
+
+You can now customize the URLs for public endpoints in the <code>openapi-3.0</code> feature.
+
+By default, two endpoints are available for a server:
+
+<code>GET http://host:http_port/api/docs</code>
+<code>GET http://host:http_port/api/explorer</code>
+
+You can change the URL of the public endpoints with the <code>publicURL</code> attribute in the <code>server.xml</code>. For example, setting the following configuration in the <code>server.xml</code> makes the public REST API documentation available with <code>GET http://host:http_port/myAPI/docs</code> and <code>http://host:http_port/myAPI/explorer</code>:
+
+[code lang="xml"]
+<openapi publicURL="myAPI" />
+[/code]
+
+<div id="sociallogin" />
+
+<h2>Social Login</h2>
+
+Server administrators can now configure multiple social media providers to protect a given web application so that users can choose which provider they want to use to authenticate with your application:
+
+<img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/11/social_media_selection_page-e1511351122596-1024x502.png" alt="" width="640" height="314" class="aligncenter size-large wp-image-24015 screenshot" />
+
+To enable this functionality, server administrators simply enable the feature in <code>server.xml</code> and configure multiple social media providers to protect an application. The social media providers can either protect all applications or use authentication filters to protect a specific endpoint. Additional configuration is not necessary.
+
+[code lang="xml"]
+<featureManager>
+    <feature>socialLogin-1.0</feature>
+</featureManager>
+[/code]
+
+<div id="logstash" />
+
+<h2>Throttle events in Logstash log collector</h2>
+
+Sending a sudden burst of events to Logstash can overwhelm the downstream logging stack.
+
+To limit the number of events being sent through per second, customize the maximum events by setting the new <code>maxEvents</code> attribute in the <code>logstashCollector</code> element in the <code>server.xml</code>. The default value is <code>0</code>, meaning there is no limit to the number of events sent per second. If you would like to throttle the events, set the value to an integer greater than <code>0</code>.
+
+For more details, see <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_analytics_logstash.html">the Knowledge Center documentation</a>.
+
+<p class="ibm-btn-row pn-p40">
+<span class="aligncenter"><a class="ibm-btn-sec ibm-btn-blue-50" title="Download Liberty 17.0.0.4"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download Liberty 17.0.0.4</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></span>
+</p>
+
+<a href="https://openliberty.io/"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/09/OL_badge-1024x306.png" alt="Built on Open Liberty" width="640" height="191" class="alignleft size-large wp-image-23627" /></a>
+
+We'd love you to get involved in any way that you can, such as testing the code in ways that you use Liberty and raising issues <a href="https://github.com/openliberty/">on GitHub</a>, or create pull requests on the code and documentation. You can contribute to discussions about Open Liberty on the <a href="https://groups.io/g/openliberty">mailing list</a>.
+
+<p style="clear:left"></p>

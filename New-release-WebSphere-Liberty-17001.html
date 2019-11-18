@@ -1,0 +1,162 @@
+<p class="ibm-btn-row pn-p40">
+    <a class="ibm-btn-sec ibm-btn-blue-50" title="Download Liberty 17.0.0.1"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download Liberty 17.0.0.1</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a>
+    </p>
+    
+    What's new in this release?
+    
+    <ul>
+    <li><a href="#Liberty">Liberty updates</a></li>
+    <li><a href="#Migration">Migration Toolkit updates</a></li>
+    </ul>
+    
+    <a name="Liberty"></a>
+    
+    <h2>Liberty Updates</h2>
+    
+    <h3>IBM Cloud Product Insights for Liberty</h3>
+    
+    The new <code>productInsights-1.0</code> feature adds the capability to register a Liberty server with a Bluemix IBM Cloud Product Insights service and submit usage metrics.
+    IBM Cloud Product Insights can be used to track product instances and report usage metrics, for Liberty as well as for other IBM products. Using Product Insights, you will be able to register all of these product instances in a single dashboard, simplifying management tasks.
+    See <a href="https://developer.ibm.com/productinsights/">here</a> for a full description of the value and use of the Product Insights Service.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/ProductInsights.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/ProductInsights.png" alt="ProductInsights" width="1752" height="756" class="alignnone size-full wp-image-21770" /></a>
+    
+    <h3>Dynamic Routing feature update</h3>
+    
+    The <code>dynamicRouting-1.0</code> feature, together with the Intelligent Management for Web Servers component, now supports routing to the same application in multiple collectives. Previously, dynamic routing could route to multiple collectives only if all applications were unique to each collective. With this update, Intelligent Management for Web Servers will find all servers in all collectives that can service a particular request, and load balance requests across all of the server instances.
+    
+    The <code>dynamicRouting-1.0</code> feature and the Intelligent Management for Web Servers component now support the creation of routing rules to restrict the set of servers that will serve a request. For example, if the same application is installed on <code>clusterA</code> and <code>clusterB</code> in a collective, a set of routing rules could direct all requests where query parameter <code>test = true</code> to <code>clusterB</code>, and all other requests to <code>clusterA</code>.
+    Routing rules can also be used to configure failover. For example, a routing rule could be specified to load balance all requests for an application to a server in <code>collective1</code>, unless no servers with that application are available in <code>collective1</code>, in which case requests for that application would be routed to servers in <code>collective2</code>.
+    To take advantage of these new features, you must use Web Server Plug-ins for IBM WebSphere Application Server version 9.0.0.3 or greater.
+    
+    <h3>API Discovery Feature</h3>
+    
+    <h4>Public API Discovery</h4>
+    
+    We have introduced two new endpoints, <code>/api/explorer</code> and <code>/api/docs</code>, both of which can accessed with either HTTP or HTTPS, and without any authentication.  This means that consumers of your APIs can easily access the Swagger docs and "try out" the endpoints without setting up SSL or being included in the basic registry.  These endpoints are enabled by default and the "api" portion of the URL can be configured by using the new <code>publicURL</code> attribute, ie: <code>&lt;apiDiscovery publicURL="public/myAPI" /&gt;</code>.  For more information, check out <a href="https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.core.doc/ae/twlp_api_discovery.html">Discovering REST API documentation on a Liberty server</a>.
+    
+    <h4>Customized master Swagger document and UI</h4>
+    
+    You can now customize all aspects of the master Swagger document (ie: the Info element, host, basePath, scheme, etc).  This change applies to the <code>/docs</code> endpoint as well as the <code>/explorer</code> endpoint, which means you can customize the title and description that appears in the UI.  This customization can be done via a swagger snippet that you can point to from the new <code>swaggerDefinition</code> attribute, ie: <code>&lt;apiDiscovery swaggerDefinition="${server.config.dir}/custom/swaggerDef.yaml" /&gt;</code>.   We also have an optimization for single-application scenarios, where the singleton app will have its swagger doc (via annotations or pre-generated) become the "master doc" automatically.
+    
+    The customization also extends to the explorer:  users can now specify a CSS file that overrides the basic styling of the top of the explorer page, such as the logo and banner colour.  For more information, check out <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_api_discovery_swagger_def.html">Overwriting Swagger 2.0 document fields</a>.
+    
+    <h4>Collective Swagger UI inline and Collective API registry</h4>
+    
+    The Collective Swagger UI has been updated to inline the APIs from all collective members, instead of grouping them by each member.  This provides an "API first" view of the APIs in the collective.  There is also a public and customizable version of the Collective UI and docs, at <code>/api/collective/docs</code> and <code>/api/collective/explorer</code>, working just like the single-server scenarios outline above.
+    
+    We also have a new endpoint, <code>/api/collective/registry</code>, which lists all the APIs in the collective in a "service registry" format, where only the core information about the API <code>/service</code> is displayed (title, description, version, and hosts that support this service).  Here's an example:
+    [css]
+    { 
+       "services":[
+          { 
+             "service":"/airlines/booking",
+             "title":"Booking REST APIs",
+             "description":"A microservice exposing booking APIs for various airlines.",
+             "version":"1.0.0",
+             "hosts":[ 
+                "vm001:9081",
+                "vm002:9082"
+             ]
+          },
+          { 
+             "service":"/flight/status",
+             "title":"Flight Status REST APIs",
+             "description":"A microservice exposing flight status APIs for various airports.",
+             "version":"1.0.1",
+             "hosts":[ 
+                "vm003:9085"
+             ]
+          },
+          { 
+             "service":"/tourism",
+             "title":"Tourism REST APIs",
+             "description":"A microservice exposing tourism information for various popular destinations.",
+             "version":"2.0.0",
+             "hosts":[ 
+                "vm004:9443"
+             ]
+          }
+       ]
+    }
+    [/css]
+    
+    <h4>Proxy support</h4>
+    
+    The Swagger UI and the Swagger docs endpoints have been updated to take into consideration HTTP headers such as "host" and "referer" when building its URLs, to support Liberty instances behind a proxy.  Previously the URLs would always point directly to the Liberty instance, which sometimes was in an internal IP address that could not be reached directly.  Now, if there is a proxy in front of Liberty, that proxy URL is used.
+    
+    For more information please check out <a href="https://www.ibm.com/support/knowledgecenter/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_api_discovery_list_query.html">Listing all public RESTful APIs in a collective</a>.
+    
+    <h3>Admin Center update</h3>
+    
+    The Java Batch tool of the Admin Center (the <code>adminCenter-1.0</code> feature) has been extended to allow you to stop and restart job instance executions.  A new column in the Java Batch tool dashboard called "Actions" makes it easy for you to manage the Java Batch job instances, in addition to viewing their progress.
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/Java-Batch-Restart.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/Java-Batch-Restart.png" alt="Java Batch Restart" width="1331" height="756" class="alignnone size-full wp-image-21786" /></a>
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/Java-Batch-Stop-1.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/Java-Batch-Stop-1.png" alt="Java Batch Stop 1" width="1339" height="765" class="alignnone size-full wp-image-21787" /></a>
+    
+    <a href="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/Java-Batch-Stop-2.png"><img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/03/Java-Batch-Stop-2.png" alt="Java Batch Stop 2" width="1334" height="753" class="alignnone size-full wp-image-21788" /></a>
+    
+    <h3>Application bindings and extensions can now be specified in the server configuration</h3>
+    
+    Traditionally in WebSphere some application specific configuration information is specified in various XML files inside the application. For example, to define a virtual host for a web application you would need to specify the value in the <code>ibm-web-bnd.xml</code> file inside the WAR file.
+    
+    In Liberty 17.0.0.1, you can now specify these application binding and extension configurations in <code>server.xml</code>. You can still specify the configuration information inside the application, but any values specified in <code>server.xml</code> will take precedence.
+    
+    <h3>Transport Security Feature</h3>
+    
+    Superseding <code>ssl-1.0</code>, the <code>transportSecurity-1.0</code> feature decouples enabling the transport security from the implied protocol. The <code>ssl-1.0</code> feature does not control the enabled transport layer protocols (that is controlled by the JVM security settings), but the name had been interpreted by some to imply the SSL protocol version. As with all features, <code>ssl-1.0</code> will not be removed, but the new <code>transportSecurity-1.0</code> feature supersedes <code>ssl-1.0</code> and will contain new capabilities, such as outbound SSL configuration.
+    
+    You will now be able to call out a global default for outbound SSL, which no longer has to be shared with the default inbound SSL setting. This will allow you to set the outbound default globally rather then having to specify the SSL setting for each component.
+    
+    <h3>Logstash Collector updates</h3>
+    
+    In the garbage collection events for <code>logstashCollector-1.0</code> , we have added a new field: <code>maxHeap</code>. The <code>maxHeap</code> field indicates the maximum heap size that the JVM allows. The Liberty memory dashboard for Kibana 4 has been updated to show the <code>maxHeap</code> value in the <code>liberty_gcHeap</code> graph.
+    
+    You can use tags to identify your log records using any strings. For example, use <code>payroll</code> and <code>newyork</code> to identify log records from a server in New York that is running the payroll application. You can filter these keywords from Kibana.
+    
+    <h3>isoDateFormat</h3>
+    
+    <ul>
+    <li>A new Logging attribute <code>isoDateFormat=true/false</code> has been added for the server configuration. It allows you to configure the Liberty server to write dates in logs/trace/FFDC in <code>ISO-8601</code> format.</li>
+    <li>A new option <code>--isoDateFormat</code> has been added for the <code>binaryLogging</code> command.  You can now view the logs with the dates in <code>ISO-8601</code> format.</p></li>
+    <li><p>This gives you the ability to change the format of the dates written in the Liberty logs/trace/FFDC between the system locale and the standard <code>ISO-8601</code> formats. It enables you to customize the date and time format in the Liberty logs, to your liking of standard <code>ISO-8601</code> format or the locale format set by the system.</p></li>
+    </ul>
+    
+    <h3>Kernel Updates</h3>
+    
+    <p>A new "pause" command has been added to the server script, and a new "PAUSE" z/OS operator console command has been added that allows WebSphere Application Server Liberty profile users to pause the HTTP endpoints of a running server.  In addition to being able to pause and resume all of the server's HTTP endpoints at once, there is an additional option to target individual endpoints to pause and resume.
+    
+    Particularly on the z/OS platform, users want to have the ability to temporarily suspend traffic to a specific server without necessarily stopping it. One example is when a server loses connectivity to a back-end database, you may want to shut down incoming traffic to the server so that the web tier in front of it can route to a different system where the database connectivity is still working. You could investigate the loss of connectivity and resume the endpoint when the problem is resolved.
+    
+    <h3>WebSphere Developer Tools</h3>
+    
+    There have been a number of bug fixes.
+    
+    <p class="ibm-btn-row pn-p40">
+    <a class="ibm-btn-sec ibm-btn-blue-50" title="Download Liberty 17.0.0.1"  href="/wasdev/downloads/liberty-profile-using-non-eclipse-environments/">Download Liberty 17.0.0.1</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a>
+    </p>
+    
+    <a name="Migration"></a>
+    
+    <h2>Migration Toolkit updates</h2>
+    
+    The Migration Toolkit for Application Binaries (binary scanner) continues to be enhanced in order to assist application developers and administrators, even outside the scope of a migration, making it easier to evaluate your applications and fine tune them. Both the Eclipse-based source scanner and binary scanner contain bug fixes also.
+    
+    The Application Evaluation Report now includes a section for each application with details on the technologies used and provides a summary with the right-fit IBM platforms for each application. This makes it easier to scan multiple applications at once and quickly determine where the applications can be deployed.
+    
+    The Application Inventory Report now includes a performance considerations section for each application. The tool detects the following issues:
+    
+    <ul>
+    <li>Archives without a metadata-complete attribute set to true</li>
+    <li>Web modules that contain excessive class files</li>
+    <li>Web modules that contain excessive static resources</li>
+    </ul>
+    
+    The new <code>--sharedLibraries</code> option for the Application Inventory Report provides a way to include external dependencies in the application scan. The specified shared libraries are also scanned for dependencies on application classes, which can cause deployment problems.
+    
+    Finally, the <code>--format=txt</code> option is deprecated. Check out the <code>--format=json</code> support instead, providing a way to do easy data analysis.
+    
+    <p class="ibm-btn-row pn-p40">
+    <a class="ibm-btn-sec ibm-btn-blue-50" title="Install the Eclipse-based migration tools"  href="/wasdev/downloads/#asset/tools-WebSphere_Application_Server_Migration_Toolkit">Get the Eclipse-based tools!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="/wasdev/downloads/#asset/tools-Migration_Toolkit_for_Application_Binaries">Get the command-line tool!</a>
+    </p>

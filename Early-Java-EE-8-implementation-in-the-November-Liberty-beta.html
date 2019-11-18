@@ -1,0 +1,308 @@
+Try out our early Java EE 8 implementation of features that include Servlet 4.0, CDI 2.0, Application Security, JPA 2.2, JSF 2.3, and more! It's all in this November 2017 beta of <a href="/wasdev/websphere-liberty/">WebSphere Liberty</a>.
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2017/10/17/microprofile-1-2-liberty-17-0-0-3/">in October</a>. Look out for more betas over the coming months. If you just can't wait, take a look at the <a href="https://openliberty.io/downloads/">daily builds of Open Liberty</a>. WebSphere Liberty is built on Open Liberty.
+
+<h2>What's new in this beta?</h2>
+
+<ul>
+<li><a href="#javaee8">Java EE 8 Full Platform and Web Profile</a>
+
+<ul>
+<li><a href="#servlet40">Servlet 4.0</a></li>
+<li><a href="#appsecurity">Security API 1.0</a></li>
+<li><a href="#cdi20">CDI 2.0</a></li>
+<li><a href="#bean20">Bean validation 2.0</a></li>
+<li><a href="#jpa22">Java Persistence API 2.2 (JPA 2.2)</a></li>
+<li><a href="#jsf23">JavaServer Faces 2.3 (JSF 2.3)</a></li>
+<li><a href="#concurrency">Concurrency</a></li>
+</ul></li>
+<li>Other updates in this beta
+
+<ul>
+<li><a href="#jsfcontainer22">JSF Container 2.2</a></li>
+<li><a href="#sociallogin">Social Login</a></li>
+<li><a href="#logcollect">Throttle events in logstashCollector and bluemixLogCollector</a></li>
+</ul></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="https://developer.ibm.com/answers/questions/ask/?smartspace=wasdev">Ask a question about the beta</a></p>
+
+<div id="javaee8" />
+
+<h2>Java EE 8 Full Platform and Web Profile</h2>
+
+A first peek at all of Java EE 8 is finally here!  And this month, you can even enable all of the Java EE 8 features at the same time. =)
+You can now enable all of the Java EE 8 features (or the more lightweight set of Web Profile features) with a single feature in your <code>server.xml</code>.
+
+The new features included in <code>webProfile-8.0</code> (Java EE 8 Web Profile) are:
+
+<ul>
+<li><code>appSecurity-3.0</code></li>
+<li><code>beanValidation-2.0</code></li>
+<li><code>cdi-2.0</code></li>
+<li><code>jaxrs-2.1</code></li>
+<li><code>jpa-2.2</code></li>
+<li><code>jsf-2.3</code></li>
+<li><code>jsonb-1.0</code></li>
+<li><code>jsonp-1.1</code></li>
+<li><code>servlet-4.0</code></li>
+</ul>
+
+The <code>webProfile-8.0</code> feature also contains the following existing features that have not been updated: <code>ejbLite-3.2</code>, <code>el-3.0</code>, <code>jaspic-1.1</code>, <code>jdbc-4.2</code>, <code>jndi-1.0</code>, <code>jsp-2.3</code>, <code>managedBeans-1.0</code>, <code>transaction-1.2</code>, <code>websocket-1.1</code>.
+
+The new features included in <code>javaee-8.0</code> (Java EE 8 Full Platform) are:
+
+<ul>
+<li><code>webProfile-8.0</code> (see above)</li>
+<li><code>javaMail-1.6</code></li>
+</ul>
+
+The <code>javaee-8.0</code> feature also contains the following existing features that have not been updated: <code>appClientSupport-1.0</code>, <code>batch-1.0</code>, <code>concurrent-1.0</code>, <code>ejb-3.2</code>, <code>jacc-1.5</code>, <code>jaxws-2.2</code>, <code>jca-1.7</code>, <code>jms-2.0</code>, <code>j2eeManagement-1.1</code>, <code>wasJmsClient-2.0</code>, <code>wasJmsSecurity-1.0</code>, <code>wasJmsServer-1.0</code>.
+
+To try it out, just add the relevant feature definition to your <code>server.xml</code>.
+
+For Java EE 8 Web Profile:
+
+[code lang="xml"]
+<featureManager>
+    <feature>webProfile-8.0</feature>
+</featureManager>
+[/code]
+
+Or for Java EE 8 Full Platform:
+
+[code lang="xml"]
+<featureManager>
+    <feature>javaee-8.0</feature>
+</featureManager>
+[/code]
+
+Find out more here:
+
+<ul>
+<li><a href="http://www.oracle.com/technetwork/java/javaee/tech/java-ee-8-3890673.html">Java EE 8 technologies list (Oracle)</a></li>
+<li><a href="https://github.com/OpenLiberty/open-liberty/issues/320">Open Liberty GitHub issue for this work</a></li>
+<li><a href="https://www.ibm.com/developerworks/library/j-whats-new-in-javaee-8/">What's new in Java EE 8 (developerWorks)</a></li>
+</ul>
+
+<div id="servlet40" />
+
+<h3>Servlet 4.0</h3>
+
+Servlet 4.0 is the latest Java EE 8 version of the Servlet specification. The beta includes the following new features and functions:
+
+<ul>
+<li>Support for HTTP/2 push/promise</li>
+<li>Support for HTTP trailers</li>
+<li><code>HttpServletRequest.getServletMapping()</code></li>
+<li><code>ServletContext.getSessionTimeout() and setSessionTimeout()</code></li>
+<li><code>ServletContext.addJspFile()</code></li>
+<li>Support for new elements in <code>web.xml</code>:
+
+<ul>
+<li>default-context-path</li>
+<li>request-character-encoding</li>
+<li>response-character-encoding</li>
+</ul></li>
+</ul>
+
+To try it out, add the feature definition to <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+    <feature>servlet-4.0</feature>
+</featureManager>
+[/code]
+
+For more info, see <a href="https://jcp.org/aboutJava/communityprocess/final/jsr369/index.html">the Servlet 4.0 spec</a>.
+
+<div id="appsecurity" />
+
+<h3>Security API 1.0</h3>
+
+The <code>appSecurity-3.0</code> feature provides support for the Java EE Security API 1.0 specification. The <a href="https://jcp.org/en/jsr/detail?id=375">Java Specification Request (JSR) 375</a> specifies the requirement.
+
+The specification promotes self-contained application security portability across all Java EE servers, and makes use of modern programming concepts such as expression language and context dependency injection (CDI). It defines annotations specific to various authentication mechanisms, identity stores to handle user authentication, and common programming API to do programmatic Java EE security. It reduces the dependency on the deployment descriptors and application server based configuration for securing Java EE web resources.
+
+For example, you can create a custom token authentication mechanism that you can bundle in your web application without the need to configure the <code>login-config</code> element in the <code>web.xml</code> file with one of the predefined auth-method types. If you also include your own <code>IdentityStore</code> bean in your application, your IdentityStore can be used to verify your custom tokens without the need to configure a user registry in the <code>server.xml</code>. Your web application will use your custom tokens to authenticate the user and your own IdentityStore to validate them regardless of what application server it is deployed to.
+
+Once you configure the <code>appSecurity-3.0</code> feature, your application can annotate the authentication mechanisms and the identity stores that are needed. The applications can provide their own implementations to replace the application server provided ones. The application can also use the SecurityContext API to perform programmatic security checks. Here's an example <code>server.xml</code> configuration:
+
+[code lang="xml"]
+<server description="Java EE Security API 1.0 sample configuration">
+
+    <featureManager>
+        <feature>appSecurity-3.0</feature>
+    </featureManager>
+
+    <!-- Change password and application details -->
+    <keyStore id="defaultKeyStore" password="myKeyStorePwd" />
+
+    <application type="war" id="MyWebApp" name="MyWebApp" location="MyWebApp.war">
+        <application-bnd>
+            <security-role name="myAppRole">
+                <!-- Realm name in access id is tied to the identity store's id or defaultRealm if not provided -->
+                <user name="someUser" access-id="user:defaultRealm/someUser" />
+                <group name="someGroup" />
+            </security-role>
+        </application-bnd>
+    </application>
+
+</server>
+[/code]
+
+<div id="cdi20" />
+
+<h3>CDI 2.0</h3>
+
+CDI 2.0 is shining new and implements the latest CDI spec. It contains quite a few nice capabilities, especially the very useful and powerful Configurator SPIs. The new feature <code>cdi-2.0</code> pulls in the Weld bundle 3.0.1. The following features of CDI 2.0 are available for use:
+
+<ul>
+<li>Asynchronous events</li>
+<li>Configurators for major SPI elements</li>
+<li>Configure or veto observer methods</li>
+<li>Add built-in annotation literals</li>
+<li>Apply interceptor on producers</li>
+</ul>
+
+The support of common annotation 1.3 is not part of this beta so the observers ordering is not supported in this beta.
+
+To enable the CDI 2.0 feature just add the following feature definition to your <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+    <feature>cdi-2.0</feature>
+</featureManager>
+[/code]
+
+For more information about CDI 2.0, see <a href="http://www.cdi-spec.org/download/">the CDI spec</a>.
+
+<div id="bean20" />
+
+<h3>Bean validation 2.0</h3>
+
+With the Bean Validation 2.0 feature, Liberty is using Hibernate Validator as its bean validation implementation.  Previously for bean val 1.0 and 1.1 we used Apache Validator.  The bean val 2.0 feature provides basic support for, you guessed it, the bean validation 2.0 specification.
+
+To try it out, just enable the <code>beanValidation-2.0</code> feature in the <code>server.xml</code>:
+
+[code lang="xml"]
+<featureManager>
+    <feature>beanValidation-2.0</feature>
+</featureManager>
+[/code]
+
+You can find out more about bean validation on <a href="http://hibernate.org/validator/">the Hibernate website</a> and in <a href="http://beanvalidation.org/2.0/">the spec</a>.
+
+<div id="jpa22" />
+
+<h3>Java Persistence API 2.2 (JPA 2.2)</h3>
+
+Updated to support new features introduced in Java 8, including the new Java Date and Time API, Query Result Collection streaming, repeatable JPA annotations. See the <a href="/wasdev/blog/2017/10/26/jpa-2-2-jsf-2-3-oct-liberty-beta/">October beta</a> for more details.
+
+<div id="jsf23" />
+
+<h3>JavaServer Faces 2.3 (JSF 2.3)</h3>
+
+JavaServer Faces 2.3 (JSF 2.3) is the latest version of the JSF specification. JSF 2.3 contains many new features and enhancements.
+
+Take advantage of the latest JSF features and enhancements. The jsf-2.3 feature pulls in the Apache MyFaces implementation and integrates it into the Liberty runtime. The following features of JSF 2.3 have been tested and are available for use:
+
+<ul>
+<li><code>&lt;f:importConstants/&gt;</code></li>
+<li>Enhanced component search facility</li>
+<li>DataModel implementions can be registered</li>
+<li>CDI replacement for <code>@ManagedProperty</code></li>
+<li>UIData and <code>&lt;ui:repeat&gt;</code>support for Map and Iterable</li>
+<li><code>&lt;ui:repeat&gt;</code> condition check</li>
+<li>Java Time Support</li>
+<li>WebSocket Integration via <code>&lt;f:websocket&gt;</code></li>
+<li>Multi-field  Validation via <code>&lt;f:validateWholeBean&gt;</code></li>
+<li>Use CDI for evaluation of JSF-specific EL implicit Objects</li>
+<li>Support <code>@Inject</code> on JSF specific artifacts</li>
+<li>Ajax method invocation. See vdldoc for <code>&lt;h:commandScript&gt;</code></li>
+</ul>
+
+To enable the JSF 2.3 feature just add the following feature definition to your <code>server.xml</code>:
+
+[code lang="xml"]
+    <featureManager>
+        <feature>jsf-2.3</feature>
+    </featureManager>
+[/code]
+
+The CDI 2.0 feature is now available in this beta and should be used with this JSF 2.3 feature.
+
+For more information, see:
+* <a href="https://myfaces.apache.org/">Apache MyFaces</a>
+* <a href="https://jcp.org/en/jsr/detail?id=372">JavaServerFaces 2.3 Specification</a>
+
+<div id="concurrency" />
+
+<h3>Concurrency</h3>
+
+Application server administrators can now configure concurrency policies for managed executors for finer grained control over concurrency constraints and other behavior.  This includes how many tasks are allowed to run in parallel, how many tasks can queue up, and what action to take when it is not possible to queue a task for execution, among other behaviors.  Different policies can be assigned for long-running tasks (identified by the <code>LONGRUNNING_HINT</code> execution property) versus normal tasks.  Managed executors continue to be backed by the Liberty global thread pool and continue to benefit from Liberty's autonomic tuning but it is now possible to impose these constraints to individual managed executors or groups of managed executors (multiple can share a single concurrency policy).
+
+To try this, configure one or more concurrency policies in server configuration. For example:
+
+[code lang="xml"]
+<concurrencyPolicy id="max10" max="10" maxQueueSize="30" maxWaitForEnqueue="20s" startTimeout="1m"/>
+[/code]
+
+Managed executors can be configured to use the concurrency policy as follows:
+
+[code lang="xml"]
+<managedExecutorService jndiName="concurrent/executor1" concurrencyPolicyRef="max10"/>
+<managedScheduledExecutorService jndiName="concurrent/executor2" concurrencyPolicyRef="max10"/>
+[/code]
+
+For more information, see the Knowledge Center documentation on <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.liberty.autogen.base.doc/ae/rwlp_config_managedExecutorService.html">managed executor service</a> and <a href="https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.liberty.autogen.base.doc/ae/rwlp_config_managedScheduledExecutorService.html">managed scheduled executor service</a>.
+
+<h2>Other updates in this beta</h2>
+
+<div id="jsfcontainer22" />
+
+<h3>JSF Container 2.2</h3>
+
+This feature makes it possible to bring your own JSF 2.2 implementation (either Mojarra or MyFaces) and take advantage of CDI integrations provided by the <code>cdi-1.2</code> feature.
+
+To try this, enable the <code>jsfContainer-2.2</code> feature in your <code>server.xml</code>, and package your own JSF API and implementation inside of your application and off you go!
+
+[code lang="xml"]
+<featureManager>
+    <feature>jsfContainer-2.2</feature>
+</featureManager>
+[/code]
+
+For more info, see <a href="https://www.ibm.com/support/knowledgecenter/was_beta_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/twlp_jsf22_implementations.html">the Knowledge Center docs</a>.
+
+<div id="sociallogin" />
+
+<h3>Social Login</h3>
+
+Server administrators can now configure multiple social media providers to protect a given web application so that users can choose which provider they want to use to authenticate with your application:
+
+<img src="https://developer.ibm.com/wasdev/wp-content/uploads/sites/9/2017/11/social_media_selection_page-e1511351122596-1024x502.png" alt="" width="640" height="314" class="aligncenter size-large wp-image-24015 screenshot" />
+
+To enable this functionality, server administrators simply enable the feature in <code>server.xml</code> and configure multiple social media providers to protect an application. The social media providers can either protect all applications or use authentication filters to protect a specific endpoint. Additional configuration is not necessary.
+
+[code lang="xml"]
+<featureManager>
+    <feature>socialLogin-1.0</feature>
+</featureManager>
+[/code]
+
+<div id="logcollect" />
+
+<h3>Throttle events in logstashCollector and bluemixLogCollector</h3>
+
+The maximum number of events being sent to logstash collector is unlimited, meaning that there is an unlimited amount of events that can be sent per second.
+
+To limit the number of events being sent through per second, you can now customize the maximum events by setting the new attribute <code>maxEvents</code> in the <code>logstashCollector</code> and <code>bluemixLogCollector</code> element. The default value is <code>0</code>, meaning there is no limit to the number of events sent per second. If you would like to throttle the events, set the value to an integer greater than <code>0</code>.
+
+<h2>What’s already in there?</h2>
+
+The <a href="/wasdev/blog/2017/10/26/jpa-2-2-jsf-2-3-oct-liberty-beta/">October Liberty beta</a> included previews of some of our Java EE 8 features, including JPA 2.2 and JSF 2.3, plus OpenAPI 3.0.
+
+This is our second beta release since the <a href="/wasdev/blog/2017/10/17/microprofile-1-2-liberty-17-0-0-3/">17.0.0.3</a> release in October 2017.
+
+<p class="ibm-btn-row pn-p40"><a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a></p>

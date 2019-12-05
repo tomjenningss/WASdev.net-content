@@ -1,0 +1,65 @@
+Here's the latest WebSphere Liberty beta and WebSphere Developer Tools (WDT).
+
+Thanks to your support for our regular beta programme, we are able to release new Liberty features every few months. Most recently, <a href="/wasdev/blog/2016/12/13/new-release-websphere-liberty-16-0-0-4/">in December</a>.
+
+Look out for more betas over the coming months.
+
+<p class="ibm-btn-row pn-p40">
+<a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a>
+</p>
+
+<h2>What’s in the WebSphere Liberty beta for February?</h2>
+
+<h3>JPA container 2.1</h3>
+
+The <code>jpaContainer-2.1</code> feature provides a JPA container implementation without limiting you to the core JPA function in EclipseLink. You can plug in any version of any third party JPA persistence provider implementation that is compliant with the JPA 2.1 specification, including EclipseLink with extensions like MOXy and JPA-RS.
+
+<h3>Transport Security 1.0</h3>
+
+The <code>transportSecurity-1.0</code> feature is a superset of the <code>ssl-1.0</code> feature. You will now be able to call out a global default for outbound SSL, which no longer has to be shared with the default inbound SSL setting. This will allow you to set the outbound default globally rather then having to specify the SSL setting for each component.
+
+<h3>Admin Center update</h3>
+
+The Java Batch tool of the Admin Center (the <code>adminCenter-1.0</code> feature) has been extended to allow you to stop and restart job instance executions.  A new column in the Java Batch tool dashboard called "Actions" makes it easy for you to manage the Java Batch job instances, in addition to viewing their progress.
+
+<h3>Logstash Collector and Bluemix Log Collector update</h3>
+
+In the garbage collection events for <code>logstashCollector-1.1</code> and <code>bluemixLogCollector-1.1</code>, we have added a new field: <code>ibm_maxHeap</code>.  The <code>ibm_maxHeap</code> field indicates the maximum heap size that the JVM allows.  The Liberty memory dashboard for Kibana 4 has been updated to show the <code>ibm_maxHeap</code> value in the <code>liberty_gcHeap</code> graph.
+
+<h3>Liberty: Audit extension</h3>
+
+As we bring in the full audit functionality, the Feb beta extends the basis authentication and audit management events to include form login authentication, client certificate authentication and runAs servlet delegation.
+
+<h3>isoDateFormat</h3>
+
+<ul>
+<li>A new Logging attribute <code>isoDateFormat=true/false</code> has been added for the server configuration. It allows you to configure the Liberty server to write dates in logs/trace/FFDC in <code>ISO-8601</code> format.</li>
+<li>A new option <code>--isoDateFormat</code> has been added for the <code>binaryLogging</code> command.  You can now view the logs with the dates in <code>ISO-8601</code> format.</p></li>
+<li><p>This gives you the ability to change the format of the dates written in the Liberty logs/trace/FFDC between the system locale and the standard <code>ISO-8601</code> formats. It enables you to customize the date and time format in the Liberty logs, to your liking of standard <code>ISO-8601</code> format or the locale format set by the system.</p></li>
+</ul>
+
+<h3>Spnego 1.0 update</h3>
+
+<p>The <code>spnego-1.0</code> feature now can consume the SPNEGO token and Kerberos token; SPNEGO can now support other clients that can only create the Kerberos token.
+
+<h2>What’s already in there?</h2>
+
+The January 2017 beta included Logstash Collector and Bluemix Log Collector updates.
+
+Take a look at the previous beta announcements for a full list of stuff added since the <a href="/wasdev/blog/2016/06/24/websphere-liberty-and-tools-16-0-0-2-release/">16.0.0.2</a> release in June 2016:
+
+<ul>
+<li><a href="/wasdev/blog//2017/01/20/beta-websphere-liberty-tools-january-2017/">January 2017 beta</a></li>
+<li><a href="/wasdev/blog/2016/12/16/beta-websphere-liberty-and-tools-december-2016/">December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/11/18/beta-websphere-liberty-and-tools-novemberdecember-2016/">November/December 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/10/21/beta-websphere-liberty-and-tools-november-2016/">November 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/09/23/beta-websphere-liberty-and-tools-october-2016/">October 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/08/26/beta-websphere-liberty-and-tools-september-2016/">September 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/07/28/beta-websphere-liberty-and-tools-august-2016/">August 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/30/beta-websphere-liberty-and-tools-july-2016/">July 2016 beta</a></li>
+<li><a href="/wasdev/blog/2016/06/03/beta-websphere-liberty-and-tools-june-2016/">June 2016 beta</a></li>
+</ul>
+
+<p class="ibm-btn-row pn-p40">
+<a class="ibm-btn-sec ibm-btn-blue-50" title="Downloads" href="/wasdev/downloads/liberty-profile-beta">Get it now!</a> <a class="ibm-btn-sec ibm-btn-blue-50" href="http://stackoverflow.com/questions/ask/?tags=websphere-liberty">Ask a question on Stack Overflow</a>
+</p>
